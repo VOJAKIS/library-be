@@ -16,14 +16,14 @@ public class BookController {
 
 	@GetMapping("/api/books")
 	public List<BookDataTransferObject> searchBook(@RequestParam(required = false) String bookName) {
-		System.out.println("Search books was called" + ((!bookName.isEmpty() ? ", " + bookName : ".")));
+		//System.out.println("Search books was called" + ((!bookName.isEmpty() ? ", " + bookName : ".")));
 		return bookService.getBooks();
 	}
 
 	@GetMapping("/api/books/{bookId}")
-	public BookDataTransferObject getBook(@PathVariable Long bookID) {
-		System.out.println("Get book was called, " + bookID);
-		return bookService.getBookByID(bookID);
+	public BookDataTransferObject getBook(@PathVariable Long bookId) {
+		System.out.println("Get book was called, " + bookId);
+		return bookService.getBookByID(bookId);
 	}
 
 	@PostMapping("/api/books")
@@ -33,14 +33,14 @@ public class BookController {
 	}
 
 	@PutMapping("/api/books/{bookId}")
-	public void updateBook(@PathVariable Long bookID, BookRequestDataTransferObject book) {
-		System.out.println("Update book was called, " + bookID);
-		bookService.updateBook(bookID, book);
+	public void updateBook(@PathVariable Long bookId, @RequestBody BookRequestDataTransferObject book) {
+		System.out.println("Update book was called, " + bookId);
+		bookService.updateBook(bookId, book);
 	}
 
 	@DeleteMapping("/api/books/{bookId}")
-	public void deleteCustomer(@PathVariable Long bookID) {
-		System.out.println("Delete book was called, " + bookID);
-		bookService.deleteBook(bookID);
+	public void deleteCustomer(@PathVariable Long bookId) {
+		System.out.println("Delete book was called, " + bookId);
+		bookService.deleteBook(bookId);
 	}
 }

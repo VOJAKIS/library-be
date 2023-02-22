@@ -2,7 +2,8 @@ package sk.umb.example.library.book.controller;
 
 public class BookRequestDataTransferObject {
     private String name;
-    private String authorFirstName, authorLastName;
+    private String authorFirstName;
+    private String authorLastName;
     private Integer bookCount;
     private String isbn;
 

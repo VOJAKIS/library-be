@@ -17,7 +17,9 @@ public class BookService {
 
     public BookDataTransferObject getBookByID(Long bookID) {
         int index = bookID.intValue();
-        return (index >= books.size()) ? new BookDataTransferObject() : books.get(0);
+        if (index >= books.size())
+            return new BookDataTransferObject();
+        return books.get(index);
     }
 
     public Long createBook(BookRequestDataTransferObject book) {
@@ -42,14 +44,31 @@ public class BookService {
 
 
     public void updateBook(Long bookID, BookRequestDataTransferObject book) {
-        //TODO: Implement the Update Book Action
+        for(BookDataTransferObject bookDTO : books) {
+            if(bookDTO.getId().equals(bookID)) {
+                bookDTO.setId(bookID);
+                bookDTO.setIsbn(book.getIsbn());
+                bookDTO.setAuthorFirstName(book.getAuthorFirstName());
+                bookDTO.setAuthorLastName(book.getAuthorLastName());
+                bookDTO.setName(book.getName());
+                bookDTO.setBookCount(book.getBookCount());
+                return;
+            }
+        }
     }
 
     public void deleteBook(Long bookID) {
+        //TODO: Refactor later on
+        int indexFound = 0;
         for(BookDataTransferObject bookDTO : books) {
-            if(bookDTO.getId().equals(bookID))
-                books.remove(books.indexOf(bookDTO));
+            if(bookDTO.getId().equals(bookID)) {
+                indexFound = books.indexOf(bookDTO);
+                books.remove(indexFound);
+                break;
+            }
         }
+        for(int i = indexFound; i < books.size(); i++)
+            books.get(i).setId((long) i);
     }
 
 }
