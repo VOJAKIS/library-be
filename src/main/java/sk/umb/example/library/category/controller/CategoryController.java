@@ -2,31 +2,36 @@ package sk.umb.example.library.category.controller;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+
 @RestController
 public class CategoryController {
-	@GetMapping("/api/categories")
-	public void searchCategory(@RequestParam(required = false) String categoryName) {
-		System.out.println("Search categories was called" + ((!categoryName.isEmpty() ? ", " + categoryName : ".")));
-		
-	}
 
-	@GetMapping("/api/categories/{categoryId}")
-	public void getCategory(@PathVariable Long categoryId) {
-		System.out.println("Get category was called, " + categoryId);
-	}
+    @GetMapping("api/categories")
+    public List searchCategory(@RequestParam(required = false) String categoryName) {
+        System.out.println("Searching for category: " + categoryName);
+        return Collections.emptyList();
+    }
 
-	@PostMapping("/api/categories")
-	public void createCategory() {
-		System.out.println("Create category was called.");
-	}
+    @GetMapping("api/categories/{categoryID}")
+    public void getCategory(@PathVariable Long categoryID) {
+        System.out.println("Retrieving details about category with ID " + categoryID);
+    }
 
-	@PutMapping("/api/categories/{categoryId}")
-	public void updateCategory(@PathVariable Long categoryId) {
-		System.out.println("Update category was called, " + categoryId);
-	}
+    @PostMapping("api/categories")
+    public void createCategory() {
+        System.out.println("Creating category ...");
+    }
 
-	@DeleteMapping("/api/categories/{categoryId}")
-	public void deleteCategory(@PathVariable Long categoryId) {
-		System.out.println("Delte category was called, " + categoryId);
-	}
+    @PutMapping("api/categories/{categoryID}")
+    public void updateCategory(@PathVariable Long categoryID) {
+        System.out.println("Updating category with ID" + categoryID);
+    }
+
+    @DeleteMapping("api/categories/{categoryID}")
+    public void deleteCategory(@PathVariable Long categoryID) {
+        System.out.println("Deleting category with ID" + categoryID);
+    }
+
 }

@@ -1,62 +1,40 @@
 package sk.umb.example.library.customer.controller;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.*;
 
-import sk.umb.example.library.customer.service.CustomerDataTransferObject;
-import sk.umb.example.library.customer.service.CustomerService;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 public class CustomerController {
 
-	/* Môže byť aj takto
-	@Autowired
-	private CustomerService customerService;
-	*/
+    // Chceme hladat len podla koncoveho mena
+    @GetMapping("/api/customers") // spravne pomenovanie
+    public List searchCustomer(@RequestParam(required = false) String lastName) {
+        System.out.println("Search customer called.");
 
-	/* Ako by to malo byť */
-	// Najlepšie je mať final
-	private final CustomerService customerService;
+        return Collections.emptyList();
+    }
 
-	public CustomerController(CustomerService customerService) {
-		this.customerService = customerService;
-	}
+    @GetMapping("/api/customers/{customerId}") // spravne pomenovanie
+    public void getCustomer(@PathVariable Long customerId) {
+        System.out.println("Get customer called.");
+    }
 
-	// get customer vracia list, zoznam viacerých
-	@GetMapping("/api/customers")
-	public List<CustomerDataTransferObject> searchCustomer(@RequestParam(required = false) String lastName) {
-		System.out.println("Search customer was called, " + lastName);
-		return customerService.getCustomers();
-	}
+    @PostMapping("api/customers")
+    public void createCustomer() {
+        System.out.println("Create customer called:");
+    }
 
-	// Pri customer id ccem vrátiť len jedného customera
-	@GetMapping("/api/customers/{customerId}")
-	public CustomerDataTransferObject getCustomer(@PathVariable Long customerId) {
-		System.out.println("Get customer was called, " + customerId);
-		return customerService.getCustomerById(customerId);
-	}
+    @PutMapping("/api/customers/{customerId}") // spravne pomenovanie
+    public void updateCustomer(@PathVariable Long customerId) {
+        System.out.println("Update customer called: ID" + customerId);
+    }
 
-	// Best practice: vrátiť ID vytvorenej entity
-	@PostMapping("/api/customers")
-	public String createCustomer(@RequestBody CustomerRequestDataTransferObject customer) {
-		System.out.println("Create customer was called.");
-		return "id: " + customerService.createCustomer(customer);
-	}
-
-	// Môžeme spraviť editáciu podľa seba, buď všetko v POST alebo takto
-	@PutMapping("/api/customers/{customerId}")
-	public void updateCustomer(@PathVariable Long customerId, @RequestBody CustomerRequestDataTransferObject customer) {
-		System.out.println("Update customer was called, " + customerId);
-		// TODO: Dokončiť updatovanie, nájdem customera, setnem nové hodnoty
-		customerService.updateCustomer(customerId, customer);
-	}
-
-	// TODO: Spraviť vymazávanie
-	@DeleteMapping("/api/customers/{customerId}")
-	public void deleteCustomer(@PathVariable Long customerId) {
-		System.out.println("Delte customer was called, " + customerId);
-		customerService.deleteCustomer(customerId);
-	}
+    @DeleteMapping("api/customers/{customerId}")
+    public void deleteCustomer(@PathVariable Long customerId) {
+        System.out.println("Delete customer called: ID " + customerId);
+    }
 
 }
+

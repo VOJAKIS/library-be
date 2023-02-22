@@ -2,31 +2,35 @@ package sk.umb.example.library.book.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+import java.util.Collections;
+import java.util.List;
+
 public class BookController {
-	@GetMapping("/api/books")
-	public void searchBook(@RequestParam(required = false) String bookName) {
-		System.out.println("Search books was called" + ((!bookName.isEmpty() ? ", " + bookName : ".")));
-		
-	}
 
-	@GetMapping("/api/books/{bookId}")
-	public void getBook(@PathVariable Long bookId) {
-		System.out.println("Get book was called, " + bookId);
-	}
+    @GetMapping("api/books")
+    public List searchBook(@RequestParam(required = false) String categoryName) {
+        System.out.println("Searching for book: " + categoryName);
+        return Collections.emptyList();
+    }
 
-	@PostMapping("/api/books")
-	public void createBook() {
-		System.out.println("Create book was called.");
-	}
+    @GetMapping("api/books/{bookID}")
+    public void getBook(@PathVariable Long bookID) {
+        System.out.println("Retrieving details about book with ID " + bookID);
+    }
 
-	@PutMapping("/api/books/{bookId}")
-	public void updateBook(@PathVariable Long bookId) {
-		System.out.println("Update book was called, " + bookId);
-	}
+    @PostMapping("api/books")
+    public void createBook() {
+        System.out.println("Creating book ...");
+    }
 
-	@DeleteMapping("/api/books/{bookId}")
-	public void deleteCustomer(@PathVariable Long bookId) {
-		System.out.println("Delte book was called, " + bookId);
-	}
+    @PutMapping("api/books/{bookID}")
+    public void updateBook(@PathVariable Long bookID) {
+        System.out.println("Updating book with ID" + bookID);
+    }
+
+    @DeleteMapping("api/books/{bookID}")
+    public void deleteBook(@PathVariable Long bookID) {
+        System.out.println("Deleting book with ID" + bookID);
+    }
+
 }
