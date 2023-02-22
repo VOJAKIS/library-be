@@ -23,14 +23,19 @@ public class CustomerController {
 		this.customerService = customerService;
 	}
 
-	// get customer vracia list, zoznam viacerých
+	// get customers vracia list, zoznam viacerých
 	@GetMapping("/api/customers")
 	public List<CustomerDataTransferObject> searchCustomer(@RequestParam(required = false) String lastName) {
-		System.out.println("Search customer was called, " + lastName);
-		return customerService.getCustomers();
+		if (lastName == null) {
+			System.out.println("Search customer was called.");
+			return customerService.getCustomers();
+		} else {
+			System.out.println("Search customer was called, " + lastName);
+			return customerService.getCustomers(lastName);
+		}
 	}
 
-	// Pri customer id ccem vrátiť len jedného customera
+	// Pri customer id chcem vrátiť len jedného customera
 	@GetMapping("/api/customers/{customerId}")
 	public CustomerDataTransferObject getCustomer(@PathVariable Long customerId) {
 		System.out.println("Get customer was called, " + customerId);
@@ -48,14 +53,12 @@ public class CustomerController {
 	@PutMapping("/api/customers/{customerId}")
 	public void updateCustomer(@PathVariable Long customerId, @RequestBody CustomerRequestDataTransferObject customer) {
 		System.out.println("Update customer was called, " + customerId);
-		// TODO: Dokončiť updatovanie, nájdem customera, setnem nové hodnoty
 		customerService.updateCustomer(customerId, customer);
 	}
 
-	// TODO: Spraviť vymazávanie
 	@DeleteMapping("/api/customers/{customerId}")
 	public void deleteCustomer(@PathVariable Long customerId) {
-		System.out.println("Delte customer was called, " + customerId);
+		System.out.println("Delete customer was called, " + customerId);
 		customerService.deleteCustomer(customerId);
 	}
 
