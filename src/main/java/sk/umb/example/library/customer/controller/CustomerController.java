@@ -18,9 +18,11 @@ public class CustomerController {
 	/* Ako by to malo byť */
 	// Najlepšie je mať final
 	private final CustomerService customerService;
+	public static CustomerService customerServiceGlobal;
 
 	public CustomerController(CustomerService customerService) {
 		this.customerService = customerService;
+		customerServiceGlobal = this.customerService;
 	}
 
 	// get customers vracia list, zoznam viacerých

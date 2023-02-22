@@ -10,29 +10,50 @@ import java.util.List;
 public class BookService {
 
     private final List<BookDataTransferObject> books = new ArrayList<>();
+    private Long lastIndex = 0L;
 
     public List<BookDataTransferObject> getBooks() {
         return books;
     }
 
-    public BookDataTransferObject getBookByID(Long bookID) {
-        int index = bookID.intValue();
-        if (index >= books.size())
-            return new BookDataTransferObject();
-        return books.get(index);
+    public BookDataTransferObject getBookById(Long bookId) {
+        if (bookId < 0) { return null; }
+        if (bookId >= lastIndex) { return null; }
+        // if (bookId < 0) { return new BookDataTransferObject(); }
+        // if (bookId >= lastIndex) { return new BookDataTransferObject(); }
+
+        for (BookDataTransferObject book : books) {
+			if (book.getId().equals(bookId)) {
+				return book;
+			}
+		}
+        // return new BookDataTransferObject();
+        return null;
     }
 
     public Long createBook(BookRequestDataTransferObject book) {
-        Long bookID = (long) books.size();
-        BookDataTransferObject bookDTO = mapToBookDTO(book);
-        bookDTO.setId(bookID);
+        // Long bookId = (long) books.size();
+        BookDataTransferObject bookDataTransferObject = mapToBookDataTransferObject(book);
+        bookDataTransferObject.setId(lastIndex);
 
-        books.add(bookDTO);
-        return bookDTO.getId();
+        increaseIndexByOne();
+        printLastIndex();
+
+        books.add(bookDataTransferObject);
+
+        return bookDataTransferObject.getId();
     }
 
-    private BookDataTransferObject mapToBookDTO(BookRequestDataTransferObject book) {
+    private void increaseIndexByOne() {
+		lastIndex++;
+	}
+	private void printLastIndex() {
+		System.out.println("Last index: " + lastIndex);
+	}
+
+    private BookDataTransferObject mapToBookDataTransferObject(BookRequestDataTransferObject book) {
         BookDataTransferObject bookDTO = new BookDataTransferObject();
+
         bookDTO.setName(book.getName());
         bookDTO.setIsbn(book.getIsbn());
         bookDTO.setAuthorFirstName(book.getAuthorFirstName());
@@ -43,10 +64,9 @@ public class BookService {
     }
 
 
-    public void updateBook(Long bookID, BookRequestDataTransferObject book) {
+    public void updateBook(Long bookId, BookRequestDataTransferObject book) {
         for(BookDataTransferObject bookDTO : books) {
-            if(bookDTO.getId().equals(bookID)) {
-                bookDTO.setId(bookID);
+            if(bookDTO.getId().equals(bookId)) {
                 bookDTO.setIsbn(book.getIsbn());
                 bookDTO.setAuthorFirstName(book.getAuthorFirstName());
                 bookDTO.setAuthorLastName(book.getAuthorLastName());
@@ -57,18 +77,16 @@ public class BookService {
         }
     }
 
-    public void deleteBook(Long bookID) {
-        //TODO: Refactor later on
-        int indexFound = 0;
-        for(BookDataTransferObject bookDTO : books) {
-            if(bookDTO.getId().equals(bookID)) {
-                indexFound = books.indexOf(bookDTO);
-                books.remove(indexFound);
-                break;
-            }
-        }
-        for(int i = indexFound; i < books.size(); i++)
-            books.get(i).setId((long) i);
+    public void deleteBook(Long bookId) {
+        if (bookId < 0) { return; }
+		if (bookId >= lastIndex) { return; }
+
+        for (BookDataTransferObject book : books) {
+			if (book.getId().equals(bookId)) {
+				books.remove(book);
+				return;
+			}
+		}
     }
 
 }

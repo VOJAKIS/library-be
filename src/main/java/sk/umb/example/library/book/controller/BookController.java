@@ -10,8 +10,10 @@ import java.util.List;
 public class BookController {
 
 	private final BookService bookService;
+	public static BookService bookServiceGlobal;
 	public BookController(BookService bookService) {
 		this.bookService = bookService;
+		bookServiceGlobal = this.bookService;
 	}
 
 	@GetMapping("/api/books")
@@ -23,13 +25,13 @@ public class BookController {
 	@GetMapping("/api/books/{bookId}")
 	public BookDataTransferObject getBook(@PathVariable Long bookId) {
 		System.out.println("Get book was called, " + bookId);
-		return bookService.getBookByID(bookId);
+		return bookService.getBookById(bookId);
 	}
 
 	@PostMapping("/api/books")
 	public String createBook(@RequestBody BookRequestDataTransferObject book) {
 		System.out.println("Create book was called.");
-		return "id:" + bookService.createBook(book);
+		return "id: " + bookService.createBook(book);
 	}
 
 	@PutMapping("/api/books/{bookId}")

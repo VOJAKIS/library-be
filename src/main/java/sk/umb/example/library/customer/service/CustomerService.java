@@ -20,21 +20,23 @@ public class CustomerService {
 	}
 
 	public List<CustomerDataTransferObject> getCustomers(String lastName) {
-		List<CustomerDataTransferObject> resultOfSearch = new ArrayList<>();
+		List<CustomerDataTransferObject> searchResult = new ArrayList<>();
 		for (CustomerDataTransferObject customerFromList : customers) {
 			if (customerFromList.getLastname().toLowerCase().contains(lastName.toLowerCase())) {
-				resultOfSearch.add(customerFromList);
+				searchResult.add(customerFromList);
 			}
 		}
-		return resultOfSearch;
+		return searchResult;
 	}
 
 	public CustomerDataTransferObject getCustomerById(Long customerId) {
 		if (customerId < 0) { return new CustomerDataTransferObject(); }
+		// if (customerId < 0) { return null; }
 
 		// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel.
 		// return null;
 		if (customerId >= lastIndex) { return new CustomerDataTransferObject(); }
+		// if (customerId >= lastIndex) { return null; }
 
 		for (CustomerDataTransferObject customer : customers) {
 			if (customer.getId().equals(customerId)) {
@@ -54,7 +56,7 @@ public class CustomerService {
 
 	public Long createCustomer(CustomerRequestDataTransferObject customer) {
 		// Long customerId = (long)customers.size();
-		CustomerDataTransferObject customerDataTransferObject = mapToCustomerDataTransfterObject(customer);
+		CustomerDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
 		customerDataTransferObject.setId(lastIndex);
 
 		increaseIndexByOne();
@@ -65,7 +67,7 @@ public class CustomerService {
 		return customerDataTransferObject.getId();
 	}
 
-	private static CustomerDataTransferObject mapToCustomerDataTransfterObject(CustomerRequestDataTransferObject customer) {
+	private static CustomerDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
 		CustomerDataTransferObject customerDataTransferObject = new CustomerDataTransferObject();
 
 		customerDataTransferObject.setFirstname(customer.getFirstName());
