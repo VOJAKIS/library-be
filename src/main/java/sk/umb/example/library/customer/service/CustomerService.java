@@ -80,9 +80,7 @@ public class CustomerService {
 	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
 		for (CustomerDataTransferObject customerFromList : customers) {
 			if (customerFromList.getId().equals(customerId)) {
-				customerFromList.setFirstname(customer.getFirstName());
-				customerFromList.setLastname(customer.getLastName());
-				customerFromList.setContact(customer.getContact());
+				customerFromList = mapToCustomerDataTransferObject(customer);
 				return;
 			}
 		}

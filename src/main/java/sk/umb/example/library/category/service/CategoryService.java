@@ -50,18 +50,16 @@ public class CategoryService {
 
 
     private CategoryDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
-        CategoryDataTransferObject categoryDTO = new CategoryDataTransferObject();
-        categoryDTO.setName(category.getName());
-        categoryDTO.setCategoryIds(category.getCategoryIds());
+        CategoryDataTransferObject categoryDataTransferObject = new CategoryDataTransferObject();
+        categoryDataTransferObject.setName(category.getName());
 
-        return categoryDTO;
+        return categoryDataTransferObject;
     }
 
     public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
-        for(CategoryDataTransferObject categoryDTO : categories) {
-            if(categoryDTO.getId().equals(categoryId)) {
-                categoryDTO.setName(category.getName());
-                categoryDTO.setCategoryIds(category.getCategoryIds());
+        for(CategoryDataTransferObject categoryDataTransferObject : categories) {
+            if(categoryDataTransferObject.getId().equals(categoryId)) {
+                categoryDataTransferObject = mapToCategoryDataTransferObject(category);
                 return;
             }
         }
