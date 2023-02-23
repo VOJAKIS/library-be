@@ -22,7 +22,7 @@ public class CustomerService {
 	public List<CustomerDataTransferObject> getCustomers(String lastName) {
 		List<CustomerDataTransferObject> searchResult = new ArrayList<>();
 		for (CustomerDataTransferObject customerFromList : customers) {
-			if (customerFromList.getLastname().toLowerCase().contains(lastName.toLowerCase())) {
+			if (customerFromList.getLastName().toLowerCase().contains(lastName.toLowerCase())) {
 				searchResult.add(customerFromList);
 			}
 		}
@@ -31,12 +31,10 @@ public class CustomerService {
 
 	public CustomerDataTransferObject getCustomerById(Long customerId) {
 		if (customerId < 0) { return new CustomerDataTransferObject(); }
-		// if (customerId < 0) { return null; }
 
 		// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel.
 		// return null;
 		if (customerId >= lastIndex) { return new CustomerDataTransferObject(); }
-		// if (customerId >= lastIndex) { return null; }
 
 		for (CustomerDataTransferObject customer : customers) {
 			if (customer.getId().equals(customerId)) {
@@ -55,7 +53,6 @@ public class CustomerService {
 	}
 
 	public Long createCustomer(CustomerRequestDataTransferObject customer) {
-		// Long customerId = (long)customers.size();
 		CustomerDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
 		customerDataTransferObject.setId(lastIndex);
 
@@ -70,9 +67,9 @@ public class CustomerService {
 	private static CustomerDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
 		CustomerDataTransferObject customerDataTransferObject = new CustomerDataTransferObject();
 
-		customerDataTransferObject.setFirstname(customer.getFirstName());
-		customerDataTransferObject.setLastname(customer.getLastName());
-		customerDataTransferObject.setContact(customer.getContact());
+		customerDataTransferObject.setFirstName(customer.getFirstName());
+		customerDataTransferObject.setLastName(customer.getLastName());
+		customerDataTransferObject.setContactEmail(customer.getContactEmail());
 
 		return customerDataTransferObject;
 	}

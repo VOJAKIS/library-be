@@ -2,9 +2,9 @@ package sk.umb.example.library.customer.service;
 
 public class CustomerDataTransferObject {
 	private Long id;
-	private String firstname;
-	private String lastname;
-	private String contact;
+	private String firstName;
+	private String lastName;
+	private String contactEmail;
 
 	public Long getId() {
 		return this.id;
@@ -14,27 +14,27 @@ public class CustomerDataTransferObject {
 		this.id = id;
 	}
 
-	public String getFirstname() {
-		return this.firstname;
+	public String getFirstName() {
+		return this.firstName;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
+	public void setFirstName(String firstname) {
+		this.firstName = firstname;
 	}
 
-	public String getLastname() {
-		return this.lastname;
+	public String getLastName() {
+		return this.lastName;
 	}
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public void setLastName(String lastname) {
+		this.lastName = lastname;
 	}
 
-	public String getContact() {
-		return this.contact;
+	public String getContactEmail() {
+		return this.contactEmail;
 	}
 
-	public void setContact(String contact) {
-		this.contact = contact;
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
 	}
 }
