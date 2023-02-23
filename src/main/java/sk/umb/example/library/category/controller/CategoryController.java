@@ -16,7 +16,6 @@ public class CategoryController {
 
 	@GetMapping("/api/categories")
 	public List<CategoryDataTransferObject> searchCategory(@RequestParam(required = false) String categoryName) {
-//		System.out.println("Search categories was called" + ((!categoryName.isEmpty() ? ", " + categoryName : ".")));
 		System.out.println("Search categories was called: " + categoryName);
 		return categoryService.getCategories();
 	}
@@ -30,7 +29,7 @@ public class CategoryController {
 	@PostMapping("/api/categories")
 	public String createCategory(@RequestBody CategoryRequestDataTransferObject category) {
 		System.out.println("Create category was called.");
-		return "id:" + categoryService.createCategory(category);
+		return "id: " + categoryService.createCategory(category);
 	}
 
 	@PutMapping("/api/categories/{categoryId}")

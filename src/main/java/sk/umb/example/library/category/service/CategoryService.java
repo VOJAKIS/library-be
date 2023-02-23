@@ -10,28 +10,46 @@ import java.util.List;
 public class CategoryService {
 
     private final List<CategoryDataTransferObject> categories =  new ArrayList<>();
+    private Long lastIndex = 0L;
 
     public List<CategoryDataTransferObject> getCategories() {
         return categories;
     }
 
     public CategoryDataTransferObject getCategoryById(Long categoryId) {
-        int index = categoryId.intValue();
-        if(index >= categories.size())
-            return new CategoryDataTransferObject();
-        return categories.get(index);
+        if (categoryId < 0) { return new CategoryDataTransferObject(); }
+        if (categoryId >= lastIndex) { return new CategoryDataTransferObject(); }
+
+        for (CategoryDataTransferObject category : categories) {
+			if (category.getId().equals(categoryId)) {
+				return category;
+			}
+		}
+		
+		return new CategoryDataTransferObject();
     }
 
     public Long createCategory(CategoryRequestDataTransferObject category) {
-        Long categoryId = (long) categories.size();
-        CategoryDataTransferObject categoryDTO = mapToCategoryDTO(category);
-        categoryDTO.setId(categoryId);
+        CategoryDataTransferObject categoryDataTransferObject = mapToCategoryDataTransferObject(category);
+        categoryDataTransferObject.setId(lastIndex);
 
-        categories.add(categoryDTO);
-        return categoryDTO.getId();
+        increaseIndexByOne();
+        printLastIndex();
+
+        categories.add(categoryDataTransferObject);
+
+        return categoryDataTransferObject.getId();
     }
 
-    private CategoryDataTransferObject mapToCategoryDTO(CategoryRequestDataTransferObject category) {
+    private void increaseIndexByOne() {
+		lastIndex++;
+	}
+	private void printLastIndex() {
+		System.out.println("Last index: " + lastIndex);
+	}
+
+
+    private CategoryDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
         CategoryDataTransferObject categoryDTO = new CategoryDataTransferObject();
         categoryDTO.setName(category.getName());
         categoryDTO.setCategoryIds(category.getCategoryIds());
@@ -42,7 +60,6 @@ public class CategoryService {
     public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
         for(CategoryDataTransferObject categoryDTO : categories) {
             if(categoryDTO.getId().equals(categoryId)) {
-                categoryDTO.setId(categoryId);
                 categoryDTO.setName(category.getName());
                 categoryDTO.setCategoryIds(category.getCategoryIds());
                 return;
@@ -51,16 +68,15 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long categoryId) {
-        int indexFound = 0;
-        for(CategoryDataTransferObject categoryDTO : categories) {
-            if(categoryDTO.getId().equals(categoryId)) {
-                indexFound = categories.indexOf(categoryDTO);
-                categories.remove(indexFound);
-                break;
-            }
-        }
-        for(int i = indexFound; i < categories.size(); i++)
-            categories.get(i).setId((long) i);
+        if (categoryId < 0) { return; }
+		if (categoryId >= lastIndex) { return; }
+
+		for (CategoryDataTransferObject categoryFromList : categories) {
+			if (categoryFromList.getId().equals(categoryId)) {
+				categories.remove(categoryFromList);
+				return;
+			}
+		}
     }
 
 
