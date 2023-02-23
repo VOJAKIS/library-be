@@ -75,9 +75,13 @@ public class CustomerService {
 	}
 
 	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
-		for (CustomerDataTransferObject customerFromList : customers) {
-			if (customerFromList.getId().equals(customerId)) {
-				customerFromList = mapToCustomerDataTransferObject(customer);
+		for (CustomerDataTransferObject customerDataTransferObject : customers) {
+			System.out.println(customerDataTransferObject.getId() + " : " + customerId);
+			if (customerDataTransferObject.getId().equals(customerId)) {
+				// Cez map to nefunguje
+				customerDataTransferObject.setFirstName(customer.getFirstName());
+				customerDataTransferObject.setLastName(customer.getLastName());
+				customerDataTransferObject.setContactEmail(customer.getContactEmail());
 				return;
 			}
 		}

@@ -63,7 +63,12 @@ public class BookService {
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
         for(BookDataTransferObject bookDataTransferObject : books) {
             if(bookDataTransferObject.getId().equals(bookId)) {
-                bookDataTransferObject = mapToBookDataTransferObject(book);
+                bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
+                bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
+                bookDataTransferObject.setTitle(book.getTitle());
+                bookDataTransferObject.setIsbn(book.getIsbn());
+                bookDataTransferObject.setBookCount(book.getBookCount());
+                bookDataTransferObject.setCategoryIds(book.getCategoryIds());
                 return;
             }
         }

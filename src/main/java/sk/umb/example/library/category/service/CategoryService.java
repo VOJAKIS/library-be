@@ -51,6 +51,7 @@ public class CategoryService {
 
     private CategoryDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
         CategoryDataTransferObject categoryDataTransferObject = new CategoryDataTransferObject();
+        
         categoryDataTransferObject.setName(category.getName());
 
         return categoryDataTransferObject;
@@ -59,7 +60,7 @@ public class CategoryService {
     public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
         for(CategoryDataTransferObject categoryDataTransferObject : categories) {
             if(categoryDataTransferObject.getId().equals(categoryId)) {
-                categoryDataTransferObject = mapToCategoryDataTransferObject(category);
+                categoryDataTransferObject.setName(category.getName());
                 return;
             }
         }
