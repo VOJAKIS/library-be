@@ -2,7 +2,7 @@ package sk.umb.example.library.book.service;
 
 import java.util.List;
 
-public class BookDataTransferObject {
+public class BookDetailDataTransferObject {
     private Long id;
     private String authorFirstName;
     private String authorLastName;

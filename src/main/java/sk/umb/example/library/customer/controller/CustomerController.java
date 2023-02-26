@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import sk.umb.example.library.customer.service.CustomerDataTransferObject;
+import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
+import sk.umb.example.library.customer.service.CustomerRequestDataTransferObject;
 import sk.umb.example.library.customer.service.CustomerService;
 
 @RestController
@@ -27,7 +28,7 @@ public class CustomerController {
 
 	// get customers vracia list, zoznam viacerých
 	@GetMapping("/api/customers")
-	public List<CustomerDataTransferObject> searchCustomer(@RequestParam(required = false) String lastName) {
+	public List<CustomerDetailDataTransferObject> searchCustomer(@RequestParam(required = false) String lastName) {
 		if (lastName == null) {
 			System.out.println("Search customer was called.");
 			return customerService.getCustomers();
@@ -39,7 +40,7 @@ public class CustomerController {
 
 	// Pri customer id chcem vrátiť len jedného customera
 	@GetMapping("/api/customers/{customerId}")
-	public CustomerDataTransferObject getCustomer(@PathVariable Long customerId) {
+	public CustomerDetailDataTransferObject getCustomer(@PathVariable Long customerId) {
 		System.out.println("Get customer was called, " + customerId);
 		return customerService.getCustomerById(customerId);
 	}

@@ -1,4 +1,4 @@
-package sk.umb.example.library.category.controller;
+package sk.umb.example.library.category.service;
 
 public class CategoryRequestDataTransferObject {
 

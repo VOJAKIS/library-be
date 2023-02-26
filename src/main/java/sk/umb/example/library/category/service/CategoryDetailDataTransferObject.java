@@ -1,7 +1,7 @@
 package sk.umb.example.library.category.service;
 
 
-public class CategoryDataTransferObject {
+public class CategoryDetailDataTransferObject {
 
     private Long id;
     private String name;

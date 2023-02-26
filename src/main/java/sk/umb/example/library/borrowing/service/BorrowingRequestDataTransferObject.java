@@ -1,4 +1,4 @@
-package sk.umb.example.library.borrowing.controller;
+package sk.umb.example.library.borrowing.service;
 
 public class BorrowingRequestDataTransferObject {
 	private Long bookId;

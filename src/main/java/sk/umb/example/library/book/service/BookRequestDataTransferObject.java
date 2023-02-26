@@ -1,4 +1,4 @@
-package sk.umb.example.library.book.controller;
+package sk.umb.example.library.book.service;
 
 import java.util.List;
 

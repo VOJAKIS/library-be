@@ -1,7 +1,8 @@
 package sk.umb.example.library.category.controller;
 
 import org.springframework.web.bind.annotation.*;
-import sk.umb.example.library.category.service.CategoryDataTransferObject;
+import sk.umb.example.library.category.service.CategoryDetailDataTransferObject;
+import sk.umb.example.library.category.service.CategoryRequestDataTransferObject;
 import sk.umb.example.library.category.service.CategoryService;
 
 import java.util.List;
@@ -15,13 +16,13 @@ public class CategoryController {
 	}
 
 	@GetMapping("/api/categories")
-	public List<CategoryDataTransferObject> searchCategory(@RequestParam(required = false) String categoryName) {
+	public List<CategoryDetailDataTransferObject> searchCategory(@RequestParam(required = false) String categoryName) {
 		System.out.println("Search categories was called: " + categoryName);
 		return categoryService.getCategories();
 	}
 
 	@GetMapping("/api/categories/{categoryId}")
-	public CategoryDataTransferObject getCategory(@PathVariable Long categoryId) {
+	public CategoryDetailDataTransferObject getCategory(@PathVariable Long categoryId) {
 		System.out.println("Get category was called, " + categoryId);
 		return categoryService.getCategoryById(categoryId);
 	}

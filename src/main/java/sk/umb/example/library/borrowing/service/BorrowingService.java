@@ -7,22 +7,21 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import sk.umb.example.library.book.controller.BookController;
-import sk.umb.example.library.borrowing.controller.BorrowingRequestDataTransferObject;
 import sk.umb.example.library.customer.controller.CustomerController;
 
 @Service
 public class BorrowingService {
 	
-	private final List<BorrowingDataTransferObject> borrowings = new ArrayList<>();
+	private final List<BorrowingDetailDataTransferObject> borrowings = new ArrayList<>();
 	private Long lastIndex = 0L;
 
-	public List<BorrowingDataTransferObject> getAllBorrowings() {
+	public List<BorrowingDetailDataTransferObject> getAllBorrowings() {
 		return borrowings;
 	}
 
-	public List<BorrowingDataTransferObject> serachBorrowingsByBookName(String bookName) {
-		List<BorrowingDataTransferObject> searchResult = new ArrayList<>();
-		for (BorrowingDataTransferObject borrowing : borrowings) {
+	public List<BorrowingDetailDataTransferObject> serachBorrowingsByBookName(String bookName) {
+		List<BorrowingDetailDataTransferObject> searchResult = new ArrayList<>();
+		for (BorrowingDetailDataTransferObject borrowing : borrowings) {
 			if (borrowing.getBook().getTitle().toLowerCase().contains(bookName.toLowerCase())) {
 				searchResult.add(borrowing);
 			}
@@ -30,19 +29,19 @@ public class BorrowingService {
 		return searchResult;
 	}
 
-	public BorrowingDataTransferObject getBorrowingById(Long borrowingId) {
-		if (borrowingId < 0) { return new BorrowingDataTransferObject(); }
-		if (borrowingId >= lastIndex) { return new BorrowingDataTransferObject(); }
-		for (BorrowingDataTransferObject borrowing : borrowings) {
+	public BorrowingDetailDataTransferObject getBorrowingById(Long borrowingId) {
+		if (borrowingId < 0) { return new BorrowingDetailDataTransferObject(); }
+		if (borrowingId >= lastIndex) { return new BorrowingDetailDataTransferObject(); }
+		for (BorrowingDetailDataTransferObject borrowing : borrowings) {
 			if (borrowing.getId().equals(borrowingId)) {
 				return borrowing;
 			}
 		}
-		return new BorrowingDataTransferObject();
+		return new BorrowingDetailDataTransferObject();
 	}
 
 	public Long createBorrowing(BorrowingRequestDataTransferObject borrowing) {
-		BorrowingDataTransferObject borrowingDataTransferObject = mapToBorrowingDataTransferObject(borrowing);
+		BorrowingDetailDataTransferObject borrowingDataTransferObject = mapToBorrowingDataTransferObject(borrowing);
 		if (borrowingDataTransferObject == null) { return null; }
 		borrowingDataTransferObject.setId(lastIndex);
 
@@ -61,8 +60,8 @@ public class BorrowingService {
 		System.out.println("Last index: " + lastIndex);
 	}
 
-	private BorrowingDataTransferObject mapToBorrowingDataTransferObject(BorrowingRequestDataTransferObject borrowing) {
-		BorrowingDataTransferObject borrowingDataTransferObject = new BorrowingDataTransferObject();
+	private BorrowingDetailDataTransferObject mapToBorrowingDataTransferObject(BorrowingRequestDataTransferObject borrowing) {
+		BorrowingDetailDataTransferObject borrowingDataTransferObject = new BorrowingDetailDataTransferObject();
 		
 		// >FeelsGood moment
 		Long customerId = borrowing.getCustomerId();
@@ -80,7 +79,7 @@ public class BorrowingService {
 		if (borrowingId < 0) { return; }
 		if (borrowingId >= lastIndex) { return; }
 		
-		for (BorrowingDataTransferObject borrowingDataTransferObject : borrowings) {
+		for (BorrowingDetailDataTransferObject borrowingDataTransferObject : borrowings) {
 			if (borrowingDataTransferObject.getId().equals(borrowingId)) {
 				Long customerId = borrowing.getCustomerId();
 				if (customerId == null) { return; }
@@ -98,7 +97,7 @@ public class BorrowingService {
 		if (borrowingId < 0) { return; }
 		if (borrowingId >= lastIndex) { return; }
 
-		for (BorrowingDataTransferObject borrowingFromList : borrowings) {
+		for (BorrowingDetailDataTransferObject borrowingFromList : borrowings) {
 			if (borrowingFromList.getId().equals(borrowingId)) {
 				borrowings.remove(borrowingFromList);
 				return;

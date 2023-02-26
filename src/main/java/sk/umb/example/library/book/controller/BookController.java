@@ -2,7 +2,8 @@ package sk.umb.example.library.book.controller;
 
 import org.springframework.web.bind.annotation.*;
 import sk.umb.example.library.book.service.BookService;
-import sk.umb.example.library.book.service.BookDataTransferObject;
+import sk.umb.example.library.book.service.BookDetailDataTransferObject;
+import sk.umb.example.library.book.service.BookRequestDataTransferObject;
 
 import java.util.List;
 
@@ -17,13 +18,13 @@ public class BookController {
 	}
 
 	@GetMapping("/api/books")
-	public List<BookDataTransferObject> searchBook(@RequestParam(required = false) String bookName) {
+	public List<BookDetailDataTransferObject> searchBook(@RequestParam(required = false) String bookName) {
 		System.out.println("Search books was called, " + bookName);
 		return bookService.getBooks();
 	}
 
 	@GetMapping("/api/books/{bookId}")
-	public BookDataTransferObject getBookById(@PathVariable Long bookId) {
+	public BookDetailDataTransferObject getBookById(@PathVariable Long bookId) {
 		System.out.println("Get book was called, " + bookId);
 		return bookService.getBookById(bookId);
 	}

@@ -1,7 +1,6 @@
 package sk.umb.example.library.book.service;
 
 import org.springframework.stereotype.Service;
-import sk.umb.example.library.book.controller.BookRequestDataTransferObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,27 +8,27 @@ import java.util.List;
 @Service
 public class BookService {
 
-    private final List<BookDataTransferObject> books = new ArrayList<>();
+    private final List<BookDetailDataTransferObject> books = new ArrayList<>();
     private Long lastIndex = 0L;
 
-    public List<BookDataTransferObject> getBooks() {
+    public List<BookDetailDataTransferObject> getBooks() {
         return books;
     }
 
-    public BookDataTransferObject getBookById(Long bookId) {
+    public BookDetailDataTransferObject getBookById(Long bookId) {
         if (bookId < 0) { return null; }
         if (bookId >= lastIndex) { return null; }
 
-        for (BookDataTransferObject book : books) {
+        for (BookDetailDataTransferObject book : books) {
 			if (book.getId().equals(bookId)) {
 				return book;
 			}
 		}
-        return new BookDataTransferObject();
+        return new BookDetailDataTransferObject();
     }
 
     public Long createBook(BookRequestDataTransferObject book) {
-        BookDataTransferObject bookDataTransferObject = mapToBookDataTransferObject(book);
+        BookDetailDataTransferObject bookDataTransferObject = mapToBookDataTransferObject(book);
         bookDataTransferObject.setId(lastIndex);
 
         increaseIndexByOne();
@@ -47,8 +46,8 @@ public class BookService {
 		System.out.println("Last index: " + lastIndex);
 	}
 
-    private BookDataTransferObject mapToBookDataTransferObject(BookRequestDataTransferObject book) {
-        BookDataTransferObject bookDataTransferObject = new BookDataTransferObject();
+    private BookDetailDataTransferObject mapToBookDataTransferObject(BookRequestDataTransferObject book) {
+        BookDetailDataTransferObject bookDataTransferObject = new BookDetailDataTransferObject();
 
         bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
         bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
@@ -63,8 +62,8 @@ public class BookService {
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
         if (bookId < 0) { return; }
 		if (bookId >= lastIndex) { return; }
-        
-        for(BookDataTransferObject bookDataTransferObject : books) {
+
+        for(BookDetailDataTransferObject bookDataTransferObject : books) {
             if(bookDataTransferObject.getId().equals(bookId)) {
                 bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
                 bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
@@ -81,7 +80,7 @@ public class BookService {
         if (bookId < 0) { return; }
 		if (bookId >= lastIndex) { return; }
 
-        for (BookDataTransferObject book : books) {
+        for (BookDetailDataTransferObject book : books) {
 			if (book.getId().equals(bookId)) {
 				books.remove(book);
 				return;

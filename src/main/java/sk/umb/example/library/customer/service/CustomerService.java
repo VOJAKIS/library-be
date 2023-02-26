@@ -5,23 +5,21 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import sk.umb.example.library.customer.controller.CustomerRequestDataTransferObject;
-
 @Service
 public class CustomerService {
 
 	// Pri vymazaní customera cez customers.remove(customerId) sa nám pomenia indexy
 	// Je možné použiť Mapu
-	private final List<CustomerDataTransferObject> customers = new ArrayList<>();
+	private final List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
 	private Long lastIndex = (long)customers.size();
 
-	public List<CustomerDataTransferObject> getCustomers() {
+	public List<CustomerDetailDataTransferObject> getCustomers() {
 		return customers;
 	}
 
-	public List<CustomerDataTransferObject> getCustomers(String lastName) {
-		List<CustomerDataTransferObject> searchResult = new ArrayList<>();
-		for (CustomerDataTransferObject customerFromList : customers) {
+	public List<CustomerDetailDataTransferObject> getCustomers(String lastName) {
+		List<CustomerDetailDataTransferObject> searchResult = new ArrayList<>();
+		for (CustomerDetailDataTransferObject customerFromList : customers) {
 			if (customerFromList.getLastName().toLowerCase().contains(lastName.toLowerCase())) {
 				searchResult.add(customerFromList);
 			}
@@ -29,20 +27,20 @@ public class CustomerService {
 		return searchResult;
 	}
 
-	public CustomerDataTransferObject getCustomerById(Long customerId) {
-		if (customerId < 0) { return new CustomerDataTransferObject(); }
+	public CustomerDetailDataTransferObject getCustomerById(Long customerId) {
+		if (customerId < 0) { return new CustomerDetailDataTransferObject(); }
 
 		// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel.
 		// return null;
-		if (customerId >= lastIndex) { return new CustomerDataTransferObject(); }
+		if (customerId >= lastIndex) { return new CustomerDetailDataTransferObject(); }
 
-		for (CustomerDataTransferObject customer : customers) {
+		for (CustomerDetailDataTransferObject customer : customers) {
 			if (customer.getId().equals(customerId)) {
 				return customer;
 			}
 		}
 		
-		return new CustomerDataTransferObject();
+		return new CustomerDetailDataTransferObject();
 	}
 
 	private void increaseIndexByOne() {
@@ -53,7 +51,7 @@ public class CustomerService {
 	}
 
 	public Long createCustomer(CustomerRequestDataTransferObject customer) {
-		CustomerDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
+		CustomerDetailDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
 		customerDataTransferObject.setId(lastIndex);
 
 		increaseIndexByOne();
@@ -64,8 +62,8 @@ public class CustomerService {
 		return customerDataTransferObject.getId();
 	}
 
-	private static CustomerDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
-		CustomerDataTransferObject customerDataTransferObject = new CustomerDataTransferObject();
+	private static CustomerDetailDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
+		CustomerDetailDataTransferObject customerDataTransferObject = new CustomerDetailDataTransferObject();
 
 		customerDataTransferObject.setFirstName(customer.getFirstName());
 		customerDataTransferObject.setLastName(customer.getLastName());
@@ -78,7 +76,7 @@ public class CustomerService {
 		if (customerId < 0) { return; }
 		if (customerId >= lastIndex) { return; }
 		
-		for (CustomerDataTransferObject customerDataTransferObject : customers) {
+		for (CustomerDetailDataTransferObject customerDataTransferObject : customers) {
 			System.out.println(customerDataTransferObject.getId() + " : " + customerId);
 			if (customerDataTransferObject.getId().equals(customerId)) {
 				// Cez map to nefunguje
@@ -94,7 +92,7 @@ public class CustomerService {
 		if (customerId < 0) { return; }
 		if (customerId >= lastIndex) { return; }
 
-		for (CustomerDataTransferObject customerFromList : customers) {
+		for (CustomerDetailDataTransferObject customerFromList : customers) {
 			if (customerFromList.getId().equals(customerId)) {
 				customers.remove(customerFromList);
 				return;

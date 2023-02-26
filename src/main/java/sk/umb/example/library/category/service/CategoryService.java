@@ -1,7 +1,6 @@
 package sk.umb.example.library.category.service;
 
 import org.springframework.stereotype.Service;
-import sk.umb.example.library.category.controller.CategoryRequestDataTransferObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,28 +8,28 @@ import java.util.List;
 @Service
 public class CategoryService {
 
-    private final List<CategoryDataTransferObject> categories =  new ArrayList<>();
+    private final List<CategoryDetailDataTransferObject> categories =  new ArrayList<>();
     private Long lastIndex = 0L;
 
-    public List<CategoryDataTransferObject> getCategories() {
+    public List<CategoryDetailDataTransferObject> getCategories() {
         return categories;
     }
 
-    public CategoryDataTransferObject getCategoryById(Long categoryId) {
-        if (categoryId < 0) { return new CategoryDataTransferObject(); }
-        if (categoryId >= lastIndex) { return new CategoryDataTransferObject(); }
+    public CategoryDetailDataTransferObject getCategoryById(Long categoryId) {
+        if (categoryId < 0) { return new CategoryDetailDataTransferObject(); }
+        if (categoryId >= lastIndex) { return new CategoryDetailDataTransferObject(); }
 
-        for (CategoryDataTransferObject category : categories) {
+        for (CategoryDetailDataTransferObject category : categories) {
 			if (category.getId().equals(categoryId)) {
 				return category;
 			}
 		}
 		
-		return new CategoryDataTransferObject();
+		return new CategoryDetailDataTransferObject();
     }
 
     public Long createCategory(CategoryRequestDataTransferObject category) {
-        CategoryDataTransferObject categoryDataTransferObject = mapToCategoryDataTransferObject(category);
+        CategoryDetailDataTransferObject categoryDataTransferObject = mapToCategoryDataTransferObject(category);
         categoryDataTransferObject.setId(lastIndex);
 
         increaseIndexByOne();
@@ -49,8 +48,8 @@ public class CategoryService {
 	}
 
 
-    private CategoryDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
-        CategoryDataTransferObject categoryDataTransferObject = new CategoryDataTransferObject();
+    private CategoryDetailDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
+        CategoryDetailDataTransferObject categoryDataTransferObject = new CategoryDetailDataTransferObject();
         
         categoryDataTransferObject.setName(category.getName());
 
@@ -60,8 +59,8 @@ public class CategoryService {
     public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
         if (categoryId < 0) { return; }
 		if (categoryId >= lastIndex) { return; }
-        
-        for(CategoryDataTransferObject categoryDataTransferObject : categories) {
+
+        for(CategoryDetailDataTransferObject categoryDataTransferObject : categories) {
             if(categoryDataTransferObject.getId().equals(categoryId)) {
                 categoryDataTransferObject.setName(category.getName());
                 return;
@@ -73,7 +72,7 @@ public class CategoryService {
         if (categoryId < 0) { return; }
 		if (categoryId >= lastIndex) { return; }
 
-		for (CategoryDataTransferObject categoryFromList : categories) {
+		for (CategoryDetailDataTransferObject categoryFromList : categories) {
 			if (categoryFromList.getId().equals(categoryId)) {
 				categories.remove(categoryFromList);
 				return;
