@@ -58,6 +58,9 @@ public class CategoryService {
     }
 
     public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
+        if (categoryId < 0) { return; }
+		if (categoryId >= lastIndex) { return; }
+        
         for(CategoryDataTransferObject categoryDataTransferObject : categories) {
             if(categoryDataTransferObject.getId().equals(categoryId)) {
                 categoryDataTransferObject.setName(category.getName());

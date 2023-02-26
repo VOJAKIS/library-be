@@ -61,6 +61,9 @@ public class BookService {
     }
 
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
+        if (bookId < 0) { return; }
+		if (bookId >= lastIndex) { return; }
+        
         for(BookDataTransferObject bookDataTransferObject : books) {
             if(bookDataTransferObject.getId().equals(bookId)) {
                 bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
