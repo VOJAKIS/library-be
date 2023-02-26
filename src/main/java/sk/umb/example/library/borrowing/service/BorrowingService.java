@@ -77,12 +77,16 @@ public class BorrowingService {
 	}
 
 	public void updateBorrowing(Long borrowingId, BorrowingRequestDataTransferObject borrowing) {
-		for (BorrowingDataTransferObject borrowingDataTransferObject : borrowings) {
-			if (borrowingDataTransferObject.getId().equals(borrowingId)) {
+		for (BorrowingDataTransferObject borrowingFromList : borrowings) {
+			if (borrowingFromList.getId().equals(borrowingId)) {
+
 				Long customerId = borrowing.getCustomerId();
 				if (customerId == null) { return; }
 				Long bookId = borrowing.getBookId();
 				if (bookId == null) { return; }
+				borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
+				borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
+				borrowingDataTransferObject.setDateOfBorrowing(new Date());
 				borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
 				borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
 				borrowingDataTransferObject.setDateOfBorrowing(new Date());
