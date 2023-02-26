@@ -75,6 +75,9 @@ public class CustomerService {
 	}
 
 	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
+		if (customerId < 0) { return; }
+		if (customerId >= lastIndex) { return; }
+		
 		for (CustomerDataTransferObject customerDataTransferObject : customers) {
 			System.out.println(customerDataTransferObject.getId() + " : " + customerId);
 			if (customerDataTransferObject.getId().equals(customerId)) {
