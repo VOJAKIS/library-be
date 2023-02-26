@@ -18,12 +18,12 @@ public class BookController {
 
 	@GetMapping("/api/books")
 	public List<BookDataTransferObject> searchBook(@RequestParam(required = false) String bookName) {
-		//System.out.println("Search books was called" + ((!bookName.isEmpty() ? ", " + bookName : ".")));
+		System.out.println("Search books was called, " + bookName);
 		return bookService.getBooks();
 	}
 
 	@GetMapping("/api/books/{bookId}")
-	public BookDataTransferObject getBook(@PathVariable Long bookId) {
+	public BookDataTransferObject getBookById(@PathVariable Long bookId) {
 		System.out.println("Get book was called, " + bookId);
 		return bookService.getBookById(bookId);
 	}

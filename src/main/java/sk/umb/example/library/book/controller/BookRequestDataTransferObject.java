@@ -1,11 +1,22 @@
 package sk.umb.example.library.book.controller;
 
+import java.util.List;
+
 public class BookRequestDataTransferObject {
-    private String name;
     private String authorFirstName;
     private String authorLastName;
-    private Integer bookCount;
+    private String title;
     private String isbn;
+    private Integer bookCount;
+    private List<Integer> categoryIds;
+
+    public List<Integer> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(List<Integer> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
 
     public String getIsbn() {
         return isbn;
@@ -15,12 +26,12 @@ public class BookRequestDataTransferObject {
         this.isbn = isbn;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getAuthorFirstName() {

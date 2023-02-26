@@ -1,14 +1,24 @@
 package sk.umb.example.library.book.service;
 
+import java.util.List;
 
 public class BookDataTransferObject {
-
     private Long id;
-    private String name;
+    private String authorFirstName;
+    private String authorLastName;
+    private String title;
     private String isbn;
-    private String authorFirstName, authorLastName;
     private Integer bookCount;
+    private List<Integer> categoryIds;
 
+
+    public List<Integer> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(List<Integer> categoryIds) {
+        this.categoryIds = categoryIds;
+    }
 
     public Long getId() {
         return id;
@@ -18,12 +28,12 @@ public class BookDataTransferObject {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getIsbn() {

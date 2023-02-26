@@ -19,20 +19,16 @@ public class BookService {
     public BookDataTransferObject getBookById(Long bookId) {
         if (bookId < 0) { return null; }
         if (bookId >= lastIndex) { return null; }
-        // if (bookId < 0) { return new BookDataTransferObject(); }
-        // if (bookId >= lastIndex) { return new BookDataTransferObject(); }
 
         for (BookDataTransferObject book : books) {
 			if (book.getId().equals(bookId)) {
 				return book;
 			}
 		}
-        // return new BookDataTransferObject();
-        return null;
+        return new BookDataTransferObject();
     }
 
     public Long createBook(BookRequestDataTransferObject book) {
-        // Long bookId = (long) books.size();
         BookDataTransferObject bookDataTransferObject = mapToBookDataTransferObject(book);
         bookDataTransferObject.setId(lastIndex);
 
@@ -52,26 +48,27 @@ public class BookService {
 	}
 
     private BookDataTransferObject mapToBookDataTransferObject(BookRequestDataTransferObject book) {
-        BookDataTransferObject bookDTO = new BookDataTransferObject();
+        BookDataTransferObject bookDataTransferObject = new BookDataTransferObject();
 
-        bookDTO.setName(book.getName());
-        bookDTO.setIsbn(book.getIsbn());
-        bookDTO.setAuthorFirstName(book.getAuthorFirstName());
-        bookDTO.setAuthorLastName(book.getAuthorLastName());
-        bookDTO.setBookCount(book.getBookCount());
+        bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
+        bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
+        bookDataTransferObject.setTitle(book.getTitle());
+        bookDataTransferObject.setIsbn(book.getIsbn());
+        bookDataTransferObject.setBookCount(book.getBookCount());
+        bookDataTransferObject.setCategoryIds(book.getCategoryIds());
 
-        return bookDTO;
+        return bookDataTransferObject;
     }
 
-
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
-        for(BookDataTransferObject bookDTO : books) {
-            if(bookDTO.getId().equals(bookId)) {
-                bookDTO.setIsbn(book.getIsbn());
-                bookDTO.setAuthorFirstName(book.getAuthorFirstName());
-                bookDTO.setAuthorLastName(book.getAuthorLastName());
-                bookDTO.setName(book.getName());
-                bookDTO.setBookCount(book.getBookCount());
+        for(BookDataTransferObject bookDataTransferObject : books) {
+            if(bookDataTransferObject.getId().equals(bookId)) {
+                bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
+                bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
+                bookDataTransferObject.setTitle(book.getTitle());
+                bookDataTransferObject.setIsbn(book.getIsbn());
+                bookDataTransferObject.setBookCount(book.getBookCount());
+                bookDataTransferObject.setCategoryIds(book.getCategoryIds());
                 return;
             }
         }

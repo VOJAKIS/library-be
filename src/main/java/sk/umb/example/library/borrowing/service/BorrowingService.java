@@ -1,6 +1,7 @@
 package sk.umb.example.library.borrowing.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class BorrowingService {
 	public List<BorrowingDataTransferObject> serachBorrowingsByBookName(String bookName) {
 		List<BorrowingDataTransferObject> searchResult = new ArrayList<>();
 		for (BorrowingDataTransferObject borrowing : borrowings) {
-			if (borrowing.getBook().getName().toLowerCase().contains(bookName.toLowerCase())) {
+			if (borrowing.getBook().getTitle().toLowerCase().contains(bookName.toLowerCase())) {
 				searchResult.add(borrowing);
 			}
 		}
@@ -66,27 +67,28 @@ public class BorrowingService {
 		// >FeelsGood moment
 		Long customerId = borrowing.getCustomerId();
 		if (customerId == null) { return null; }
-		borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
-		
 		Long bookId = borrowing.getBookId();
 		if (bookId == null) { return null; }
+		borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
 		borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
+		borrowingDataTransferObject.setDateOfBorrowing(new Date());
 
 		return borrowingDataTransferObject;
 	}
 
 	public void updateBorrowing(Long borrowingId, BorrowingRequestDataTransferObject borrowing) {
-		for (BorrowingDataTransferObject borrowingFromList : borrowings) {
-			if (borrowingFromList.getId().equals(borrowingId)) {
-
+		if (borrowingId < 0) { return; }
+		if (borrowingId >= lastIndex) { return; }
+		
+		for (BorrowingDataTransferObject borrowingDataTransferObject : borrowings) {
+			if (borrowingDataTransferObject.getId().equals(borrowingId)) {
 				Long customerId = borrowing.getCustomerId();
 				if (customerId == null) { return; }
-				borrowingFromList.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
-				
 				Long bookId = borrowing.getBookId();
 				if (bookId == null) { return; }
-				borrowingFromList.setBook(BookController.bookServiceGlobal.getBookById(bookId));
-
+				borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
+				borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
+				borrowingDataTransferObject.setDateOfBorrowing(new Date());
 				return;
 			}
 		}
