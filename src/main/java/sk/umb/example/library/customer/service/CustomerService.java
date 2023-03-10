@@ -38,9 +38,11 @@ public class CustomerService {
 		return mapToDataTransferObject(getCustomerEntityById(customerId));
 	}
 
+	// TODO: REMOVE
 	private void increaseIndexByOne() {
 		lastIndex++;
 	}
+	// TODO: REMOVE
 	private void printLastIndex() {
 		System.out.println("Last index: " + lastIndex);
 	}
