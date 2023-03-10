@@ -64,46 +64,17 @@
 			<version>2.0.0</version>
 		</dependency>
 
-		<!-- Treba pridať dependencie -->
-		<!-- Databáza PostgreSQL -->
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.2.0.CR2</version>
+	</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<version>1.0.2</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>7.0.2.Final</version>
-        </dependency>
-		
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-		<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-core</artifactId>
-		    <version>6.1.7.Final</version>
-		    <type>pom</type>
-		</dependency>
-
-        
-		<dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.1</version>
-        </dependency>
+	<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-entitymanager</artifactId>
+    <version>5.2.3.Final</version>
+</dependency>
 
 	</dependencies>
 

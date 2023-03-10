@@ -1,8 +1,11 @@
 package sk.umb.example.library.customer.persistence.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+// import jakarta.persistence.ManyToOne;
+// import sk.umb.example.library.address.persistence.entity.AddressEntity;
 
 @Entity(name = "customer")
 public class CustomerEntity {
@@ -14,6 +17,7 @@ public class CustomerEntity {
 
     private String lastName;
 
+		@Column(name = "contact_email")
     private String emailContact;
 
     public Long getId() {
