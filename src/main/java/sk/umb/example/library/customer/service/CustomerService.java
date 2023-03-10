@@ -5,58 +5,99 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import sk.umb.example.library.customer.controller.CustomerRequestDataTransferObject;
-
 @Service
 public class CustomerService {
 
 	// Pri vymazaní customera cez customers.remove(customerId) sa nám pomenia indexy
 	// Je možné použiť Mapu
-	private final List<CustomerDataTransferObject> customers = new ArrayList<>();
+	private final List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
+	private Long lastIndex = (long)customers.size();
 
-	public List<CustomerDataTransferObject> getCustomers() {
+	public List<CustomerDetailDataTransferObject> getCustomers() {
 		return customers;
 	}
 
-	public CustomerDataTransferObject getCustomerById(Long customerId) {
-		int index = customerId.intValue();
-
-		if (index >= customers.size()) {
-			// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel
-			return new CustomerDataTransferObject();
-			// return null;
+	public List<CustomerDetailDataTransferObject> getCustomers(String lastName) {
+		List<CustomerDetailDataTransferObject> searchResult = new ArrayList<>();
+		for (CustomerDetailDataTransferObject customerFromList : customers) {
+			if (customerFromList.getLastName().toLowerCase().contains(lastName.toLowerCase())) {
+				searchResult.add(customerFromList);
+			}
 		}
+		return searchResult;
+	}
 
-		return customers.get(0);
+	public CustomerDetailDataTransferObject getCustomerById(Long customerId) {
+		if (customerId < 0) { return new CustomerDetailDataTransferObject(); }
+
+		// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel.
+		// return null;
+		if (customerId >= lastIndex) { return new CustomerDetailDataTransferObject(); }
+
+		for (CustomerDetailDataTransferObject customer : customers) {
+			if (customer.getId().equals(customerId)) {
+				return customer;
+			}
+		}
+		
+		return new CustomerDetailDataTransferObject();
+	}
+
+	private void increaseIndexByOne() {
+		lastIndex++;
+	}
+	private void printLastIndex() {
+		System.out.println("Last index: " + lastIndex);
 	}
 
 	public Long createCustomer(CustomerRequestDataTransferObject customer) {
-		Long customerId = (long)customers.size();
+		CustomerDetailDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
+		customerDataTransferObject.setId(lastIndex);
 
-		CustomerDataTransferObject customerDataTransferObject = mapToCustomerDto(customer);
-		customerDataTransferObject.setId(customerId);
-
+		increaseIndexByOne();
+		printLastIndex();
+		
 		customers.add(customerDataTransferObject);
 
 		return customerDataTransferObject.getId();
 	}
 
-	private static CustomerDataTransferObject mapToCustomerDto(CustomerRequestDataTransferObject customer) {
-		CustomerDataTransferObject customerDataTransferObject = new CustomerDataTransferObject();
+	private static CustomerDetailDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
+		CustomerDetailDataTransferObject customerDataTransferObject = new CustomerDetailDataTransferObject();
 
-		customerDataTransferObject.setFirstname(customer.getFirstName());
-		customerDataTransferObject.setLastname(customer.getLastName());
-		customerDataTransferObject.setContact(customer.getContact());
+		customerDataTransferObject.setFirstName(customer.getFirstName());
+		customerDataTransferObject.setLastName(customer.getLastName());
+		customerDataTransferObject.setContactEmail(customer.getContactEmail());
 
 		return customerDataTransferObject;
 	}
 
 	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
-		// TODO: dokončiť
+		if (customerId < 0) { return; }
+		if (customerId >= lastIndex) { return; }
+		
+		for (CustomerDetailDataTransferObject customerDataTransferObject : customers) {
+			System.out.println(customerDataTransferObject.getId() + " : " + customerId);
+			if (customerDataTransferObject.getId().equals(customerId)) {
+				// Cez map to nefunguje
+				customerDataTransferObject.setFirstName(customer.getFirstName());
+				customerDataTransferObject.setLastName(customer.getLastName());
+				customerDataTransferObject.setContactEmail(customer.getContactEmail());
+				return;
+			}
+		}
 	}
 
 	public void deleteCustomer(Long customerId) {
-		// TODO: dokončiť
+		if (customerId < 0) { return; }
+		if (customerId >= lastIndex) { return; }
+
+		for (CustomerDetailDataTransferObject customerFromList : customers) {
+			if (customerFromList.getId().equals(customerId)) {
+				customers.remove(customerFromList);
+				return;
+			}
+		}
 	}
 
 }

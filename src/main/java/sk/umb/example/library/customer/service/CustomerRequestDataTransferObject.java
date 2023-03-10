@@ -1,9 +1,9 @@
-package sk.umb.example.library.customer.controller;
+package sk.umb.example.library.customer.service;
 
 public class CustomerRequestDataTransferObject {
 	private String firstName;
 	private String lastName;
-	private String contact;
+	private String contactEmail;
 
 	public String getFirstName() {
 		return firstName;
@@ -17,10 +17,10 @@ public class CustomerRequestDataTransferObject {
 	public void setLastName(String lastname) {
 		this.lastName = lastname;
 	}
-	public String getContact() {
-		return contact;
+	public String getContactEmail() {
+		return contactEmail;
 	}
-	public void setContact(String contact) {
-		this.contact = contact;
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
 	}	
 }
