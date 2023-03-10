@@ -2,45 +2,40 @@ package sk.umb.example.library.customer.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
+import sk.umb.example.library.customer.persistence.repository.CustomerRepository;
+
 @Service
 public class CustomerService {
+
+	private final CustomerRepository customerRepository;
+
+	public CustomerService(CustomerRepository customerRepository) {
+		this.customerRepository = customerRepository;
+	}
 
 	// Pri vymazaní customera cez customers.remove(customerId) sa nám pomenia indexy
 	// Je možné použiť Mapu
 	private final List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
 	private Long lastIndex = (long)customers.size();
 
-	public List<CustomerDetailDataTransferObject> getCustomers() {
-		return customers;
+	public List<CustomerDetailDataTransferObject> getAllCustomers() {
+		// return customers;
+		return mapToDataTransferObjectList(customerRepository.findAll());
 	}
 
-	public List<CustomerDetailDataTransferObject> getCustomers(String lastName) {
-		List<CustomerDetailDataTransferObject> searchResult = new ArrayList<>();
-		for (CustomerDetailDataTransferObject customerFromList : customers) {
-			if (customerFromList.getLastName().toLowerCase().contains(lastName.toLowerCase())) {
-				searchResult.add(customerFromList);
-			}
-		}
-		return searchResult;
+	public List<CustomerDetailDataTransferObject> getCustomerByLastName(String lastName) {
+		return mapToDataTransferObjectList(customerRepository.findByLastName(lastName));
 	}
 
 	public CustomerDetailDataTransferObject getCustomerById(Long customerId) {
-		if (customerId < 0) { return new CustomerDetailDataTransferObject(); }
-
-		// Mali by sme vrátiť error, ako 404, pretože sa customer nenašiel.
-		// return null;
-		if (customerId >= lastIndex) { return new CustomerDetailDataTransferObject(); }
-
-		for (CustomerDetailDataTransferObject customer : customers) {
-			if (customer.getId().equals(customerId)) {
-				return customer;
-			}
-		}
-		
-		return new CustomerDetailDataTransferObject();
+		return mapToDataTransferObject(getCustomerEntityById(customerId));
 	}
 
 	private void increaseIndexByOne() {
@@ -50,16 +45,53 @@ public class CustomerService {
 		System.out.println("Last index: " + lastIndex);
 	}
 
-	public Long createCustomer(CustomerRequestDataTransferObject customer) {
-		CustomerDetailDataTransferObject customerDataTransferObject = mapToCustomerDataTransferObject(customer);
-		customerDataTransferObject.setId(lastIndex);
+	@Transactional
+	public Long createCustomer(CustomerRequestDataTransferObject customerRequestDataTransferObject) {
+		CustomerEntity customerEntity = mapToEntity(customerRequestDataTransferObject);
 
-		increaseIndexByOne();
-		printLastIndex();
+		return customerRepository.save(customerEntity).getId();
+	}
+
+	private CustomerEntity mapToEntity(CustomerRequestDataTransferObject customerRequestDataTransferObject) {
+		CustomerEntity customerEntity = new CustomerEntity();
+
+        customerEntity.setFirstName(customerRequestDataTransferObject.getFirstName());
+        customerEntity.setLastName(customerRequestDataTransferObject.getLastName());
+        customerEntity.setContactEmail(customerRequestDataTransferObject.getContactEmail());
+
+        return customerEntity;
+	}
+
+	private CustomerEntity getCustomerEntityById(Long customerId) {
+		Optional<CustomerEntity> customer = customerRepository.findById(customerId);
+
+        if (customer.isEmpty()) {
+            throw new IllegalArgumentException("Customer not found. ID: " + customerId);
+        }
+
+        return customer.get();
+	}
+
+	private List<CustomerDetailDataTransferObject> mapToDataTransferObjectList(Iterable<CustomerEntity> customerEntities) {
+		List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
+	
+		customerEntities.forEach(customerEntity -> {
+			CustomerDetailDataTransferObject dto = mapToDataTransferObject(customerEntity);
+			customers.add(dto);
+		});
+	
+		return customers;
+	}
+
+	private CustomerDetailDataTransferObject mapToDataTransferObject(CustomerEntity customerEntity) {
+		CustomerDetailDataTransferObject dto = new CustomerDetailDataTransferObject();
 		
-		customers.add(customerDataTransferObject);
+        dto.setId(customerEntity.getId());
+        dto.setFirstName(customerEntity.getFirstName());
+        dto.setLastName(customerEntity.getLastName());
+        dto.setContactEmail(customerEntity.getContactEmail());
 
-		return customerDataTransferObject.getId();
+        return dto;
 	}
 
 	private static CustomerDetailDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
@@ -72,6 +104,9 @@ public class CustomerService {
 		return customerDataTransferObject;
 	}
 
+	// TODO: Skončil si tu.
+	// TODO: Prerob vecičky z githubu
+	@Transactional
 	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
 		if (customerId < 0) { return; }
 		if (customerId >= lastIndex) { return; }
@@ -88,6 +123,7 @@ public class CustomerService {
 		}
 	}
 
+	@Transactional
 	public void deleteCustomer(Long customerId) {
 		if (customerId < 0) { return; }
 		if (customerId >= lastIndex) { return; }
