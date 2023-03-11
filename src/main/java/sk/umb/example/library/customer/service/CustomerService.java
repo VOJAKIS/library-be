@@ -2,9 +2,9 @@ package sk.umb.example.library.customer.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -20,17 +20,12 @@ public class CustomerService {
 		this.customerRepository = customerRepository;
 	}
 
-	// Pri vymazaní customera cez customers.remove(customerId) sa nám pomenia indexy
-	// Je možné použiť Mapu
-	private final List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
-	private Long lastIndex = (long)customers.size();
-
 	public List<CustomerDetailDataTransferObject> getAllCustomers() {
 		// return customers;
 		return mapToDataTransferObjectList(customerRepository.findAll());
 	}
 
-	public List<CustomerDetailDataTransferObject> getCustomerByLastName(String lastName) {
+	public List<CustomerDetailDataTransferObject> getCustomersByLastName(String lastName) {
 		return mapToDataTransferObjectList(customerRepository.findByLastName(lastName));
 	}
 
@@ -38,20 +33,35 @@ public class CustomerService {
 		return mapToDataTransferObject(getCustomerEntityById(customerId));
 	}
 
-	// TODO: REMOVE
-	private void increaseIndexByOne() {
-		lastIndex++;
-	}
-	// TODO: REMOVE
-	private void printLastIndex() {
-		System.out.println("Last index: " + lastIndex);
-	}
-
 	@Transactional
 	public Long createCustomer(CustomerRequestDataTransferObject customerRequestDataTransferObject) {
 		CustomerEntity customerEntity = mapToEntity(customerRequestDataTransferObject);
 
 		return customerRepository.save(customerEntity).getId();
+	}
+
+	@Transactional
+	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customerRequestDataTransferObject) {
+		CustomerEntity customerEntity = getCustomerEntityById(customerId);
+
+        if (! Strings.isEmpty(customerRequestDataTransferObject.getFirstName())) {
+            customerEntity.setFirstName(customerRequestDataTransferObject.getFirstName());
+        }
+
+        if (! Strings.isEmpty(customerRequestDataTransferObject.getLastName())) {
+            customerEntity.setLastName(customerRequestDataTransferObject.getLastName());
+        }
+
+        if (! Strings.isEmpty(customerRequestDataTransferObject.getContactEmail())) {
+            customerEntity.setContactEmail(customerRequestDataTransferObject.getContactEmail());
+        }
+
+        customerRepository.save(customerEntity);
+	}
+
+	@Transactional
+	public void deleteCustomer(Long customerId) {
+		customerRepository.deleteById(customerId);
 	}
 
 	private CustomerEntity mapToEntity(CustomerRequestDataTransferObject customerRequestDataTransferObject) {
@@ -96,46 +106,7 @@ public class CustomerService {
         return dto;
 	}
 
-	private static CustomerDetailDataTransferObject mapToCustomerDataTransferObject(CustomerRequestDataTransferObject customer) {
-		CustomerDetailDataTransferObject customerDataTransferObject = new CustomerDetailDataTransferObject();
 
-		customerDataTransferObject.setFirstName(customer.getFirstName());
-		customerDataTransferObject.setLastName(customer.getLastName());
-		customerDataTransferObject.setContactEmail(customer.getContactEmail());
-
-		return customerDataTransferObject;
-	}
-
-	// TODO: Skončil si tu.
-	// TODO: Prerob vecičky z githubu
-	@Transactional
-	public void updateCustomer(Long customerId, CustomerRequestDataTransferObject customer) {
-		if (customerId < 0) { return; }
-		if (customerId >= lastIndex) { return; }
-		
-		for (CustomerDetailDataTransferObject customerDataTransferObject : customers) {
-			System.out.println(customerDataTransferObject.getId() + " : " + customerId);
-			if (customerDataTransferObject.getId().equals(customerId)) {
-				// Cez map to nefunguje
-				customerDataTransferObject.setFirstName(customer.getFirstName());
-				customerDataTransferObject.setLastName(customer.getLastName());
-				customerDataTransferObject.setContactEmail(customer.getContactEmail());
-				return;
-			}
-		}
-	}
-
-	@Transactional
-	public void deleteCustomer(Long customerId) {
-		if (customerId < 0) { return; }
-		if (customerId >= lastIndex) { return; }
-
-		for (CustomerDetailDataTransferObject customerFromList : customers) {
-			if (customerFromList.getId().equals(customerId)) {
-				customers.remove(customerFromList);
-				return;
-			}
-		}
-	}
+	
 
 }

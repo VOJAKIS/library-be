@@ -9,9 +9,9 @@ import jakarta.persistence.Id;
 
 @Entity(name = "customer")
 public class CustomerEntity {
-    @Id
-    @GeneratedValue
-	@Column(name = "id_customer")
+	@Id
+	@GeneratedValue
+	@Column(name = "id_customer", unique = true)
     private Long id;
 
 	@Column(name = "first_name")

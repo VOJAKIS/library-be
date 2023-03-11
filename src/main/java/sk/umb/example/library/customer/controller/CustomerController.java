@@ -34,7 +34,7 @@ public class CustomerController {
 			return customerService.getAllCustomers();
 		} else {
 			System.out.println("Search customer was called, " + lastName);
-			return customerService.getCustomerByLastName(lastName);
+			return customerService.getCustomersByLastName(lastName);
 		}
 	}
 
