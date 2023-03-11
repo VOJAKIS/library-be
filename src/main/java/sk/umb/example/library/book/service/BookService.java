@@ -2,90 +2,100 @@ package sk.umb.example.library.book.service;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import sk.umb.example.library.book.persistence.entity.BookEntity;
+import sk.umb.example.library.book.persistence.repository.BookRepository;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
 
-    private final List<BookDetailDataTransferObject> books = new ArrayList<>();
-    private Long lastIndex = 0L;
+    //? Konstruktor, inicializacia repozitaru
+    private final BookRepository bookRepository;
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
+
+    //? Get operacie
     public List<BookDetailDataTransferObject> getBooks() {
-        return books;
+        return mapToBookDataTransferObjectList(bookRepository.findAll());
     }
 
     public BookDetailDataTransferObject getBookById(Long bookId) {
-        if (bookId < 0) { return null; }
-        if (bookId >= lastIndex) { return null; }
-
-        for (BookDetailDataTransferObject book : books) {
-			if (book.getId().equals(bookId)) {
-				return book;
-			}
-		}
-        return new BookDetailDataTransferObject();
+        return mapToDataTransferObject(getBookEntityById(bookId));
     }
 
-    public Long createBook(BookRequestDataTransferObject book) {
-        BookDetailDataTransferObject bookDataTransferObject = mapToBookDataTransferObject(book);
-        bookDataTransferObject.setId(lastIndex);
-
-        increaseIndexByOne();
-        printLastIndex();
-
-        books.add(bookDataTransferObject);
-
-        return bookDataTransferObject.getId();
-    }
-
-    private void increaseIndexByOne() {
-		lastIndex++;
-	}
-	private void printLastIndex() {
-		System.out.println("Last index: " + lastIndex);
-	}
-
-    private BookDetailDataTransferObject mapToBookDataTransferObject(BookRequestDataTransferObject book) {
-        BookDetailDataTransferObject bookDataTransferObject = new BookDetailDataTransferObject();
-
-        bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
-        bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
-        bookDataTransferObject.setTitle(book.getTitle());
-        bookDataTransferObject.setIsbn(book.getIsbn());
-        bookDataTransferObject.setBookCount(book.getBookCount());
-        bookDataTransferObject.setCategoryIds(book.getCategoryIds());
-
-        return bookDataTransferObject;
-    }
-
-    public void updateBook(Long bookId, BookRequestDataTransferObject book) {
-        if (bookId < 0) { return; }
-		if (bookId >= lastIndex) { return; }
-
-        for(BookDetailDataTransferObject bookDataTransferObject : books) {
-            if(bookDataTransferObject.getId().equals(bookId)) {
-                bookDataTransferObject.setAuthorFirstName(book.getAuthorFirstName());
-                bookDataTransferObject.setAuthorLastName(book.getAuthorLastName());
-                bookDataTransferObject.setTitle(book.getTitle());
-                bookDataTransferObject.setIsbn(book.getIsbn());
-                bookDataTransferObject.setBookCount(book.getBookCount());
-                bookDataTransferObject.setCategoryIds(book.getCategoryIds());
-                return;
-            }
+    public BookEntity getBookEntityById(Long bookId) {
+        Optional<BookEntity> bookEntity = bookRepository.findById(bookId);
+        if(!bookEntity.isEmpty()) {
+            throw new IllegalArgumentException("Couldn't find book with ID:" + bookId);
         }
+
+        return bookEntity.get();
     }
 
+
+    //? Post, Update, Delete
+    @Transactional
+    public Long createBook(BookRequestDataTransferObject book) {
+        BookEntity bookEntity = mapToEntity(book);
+
+        return bookRepository.save(bookEntity).getId();
+    }
+
+    @Transactional
+    public void updateBook(Long bookId, BookRequestDataTransferObject book) {
+        BookEntity bookEntity = getBookEntityById(bookId);
+        // TODO: Pridat validaciu ze je aktualizovany subor spravny
+        bookRepository.save(bookEntity);
+    }
+
+    @Transactional
     public void deleteBook(Long bookId) {
-        if (bookId < 0) { return; }
-		if (bookId >= lastIndex) { return; }
-
-        for (BookDetailDataTransferObject book : books) {
-			if (book.getId().equals(bookId)) {
-				books.remove(book);
-				return;
-			}
-		}
+        bookRepository.deleteById(bookId);
     }
 
+    
+    //? Mapping
+    private BookEntity mapToEntity(BookRequestDataTransferObject book) {
+        BookEntity bookEntity = new BookEntity();
+        bookEntity.setAuthorFirstName(book.getAuthorFirstName());
+        bookEntity.setAuthorLastName(book.getAuthorLastName());
+        bookEntity.setTitle(book.getTitle());
+        bookEntity.setIsbn(book.getIsbn());
+        bookEntity.setBookCount(book.getBookCount());
+        bookEntity.setCategoryIds(book.getCategoryIds());
+
+        return bookEntity;
+    }
+
+    private BookDetailDataTransferObject mapToDataTransferObject(BookEntity bookEntity) {
+        BookDetailDataTransferObject book = new BookDetailDataTransferObject();
+
+        book.setId(bookEntity.getId());
+        book.setAuthorFirstName(bookEntity.getAuthorFirstName());
+        book.setAuthorLastName(bookEntity.getAuthorLastName());
+        book.setTitle(bookEntity.getTitle());
+        book.setIsbn(bookEntity.getIsbn());
+        book.setBookCount(bookEntity.getBookCount());
+        book.setCategoryIds(bookEntity.getCategoryIds());
+
+        return book;
+    }
+    
+    private List<BookDetailDataTransferObject> mapToBookDataTransferObjectList(Iterable<BookEntity> bookEntities) {
+        List<BookDetailDataTransferObject> books = new ArrayList<>();
+
+        bookEntities.forEach(categoryEntity -> {
+            BookDetailDataTransferObject bookDDTO = mapToDataTransferObject(categoryEntity);
+            books.add(bookDDTO);
+        });
+
+        return books;
+    }
+    
 }
