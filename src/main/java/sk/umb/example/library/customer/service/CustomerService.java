@@ -21,7 +21,6 @@ public class CustomerService {
 	}
 
 	public List<CustomerDetailDataTransferObject> getAllCustomers() {
-		// return customers;
 		return mapToDataTransferObjectList(customerRepository.findAll());
 	}
 
@@ -75,38 +74,35 @@ public class CustomerService {
 	}
 
 	private CustomerEntity getCustomerEntityById(Long customerId) {
-		Optional<CustomerEntity> customer = customerRepository.findById(customerId);
+		Optional<CustomerEntity> customerEntity = customerRepository.findById(customerId);
 
-        if (customer.isEmpty()) {
+        if (customerEntity.isEmpty()) {
             throw new IllegalArgumentException("Customer not found. ID: " + customerId);
         }
 
-        return customer.get();
+        return customerEntity.get();
 	}
 
 	private List<CustomerDetailDataTransferObject> mapToDataTransferObjectList(Iterable<CustomerEntity> customerEntities) {
-		List<CustomerDetailDataTransferObject> customers = new ArrayList<>();
+		List<CustomerDetailDataTransferObject> customerDetailDataTransferObjects = new ArrayList<>();
 	
 		customerEntities.forEach(customerEntity -> {
-			CustomerDetailDataTransferObject dto = mapToDataTransferObject(customerEntity);
-			customers.add(dto);
+			CustomerDetailDataTransferObject customerDetailDataTransferObject = mapToDataTransferObject(customerEntity);
+			customerDetailDataTransferObjects.add(customerDetailDataTransferObject);
 		});
 	
-		return customers;
+		return customerDetailDataTransferObjects;
 	}
 
 	private CustomerDetailDataTransferObject mapToDataTransferObject(CustomerEntity customerEntity) {
-		CustomerDetailDataTransferObject dto = new CustomerDetailDataTransferObject();
+		CustomerDetailDataTransferObject customerDetailDataTransferObject = new CustomerDetailDataTransferObject();
 		
-        dto.setId(customerEntity.getId());
-        dto.setFirstName(customerEntity.getFirstName());
-        dto.setLastName(customerEntity.getLastName());
-        dto.setContactEmail(customerEntity.getContactEmail());
+        customerDetailDataTransferObject.setId(customerEntity.getId());
+        customerDetailDataTransferObject.setFirstName(customerEntity.getFirstName());
+        customerDetailDataTransferObject.setLastName(customerEntity.getLastName());
+        customerDetailDataTransferObject.setContactEmail(customerEntity.getContactEmail());
 
-        return dto;
+        return customerDetailDataTransferObject;
 	}
-
-
-	
 
 }
