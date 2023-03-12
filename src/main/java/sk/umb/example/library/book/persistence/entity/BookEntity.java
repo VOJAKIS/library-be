@@ -16,10 +16,10 @@ public class BookEntity {
     @Column(name = "id_book", unique = true)
     private Long id;
 
-    @Column(name = "author_firstName")
+    @Column(name = "author_first_name")
     private String authorFirstName;
     
-    @Column(name = "author_LastName")
+    @Column(name = "author_last_name")
     private String authorLastName;
     
     @Column(name = "title")
