@@ -11,4 +11,7 @@ import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
 public interface BorrowingRepository extends CrudRepository<BorrowingEntity, Long> {
 	@Override
 	List<BorrowingEntity> findAll();
+
+	List<BorrowingEntity> findByBookTitle(String bookTitle);
+
 }

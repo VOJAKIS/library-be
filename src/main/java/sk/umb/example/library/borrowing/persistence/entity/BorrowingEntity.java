@@ -1,11 +1,14 @@
 package sk.umb.example.library.borrowing.persistence.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import sk.umb.example.library.book.persistence.entity.BookEntity;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 
@@ -17,12 +20,27 @@ public class BorrowingEntity {
 	private Long id;
 
 	@ManyToOne
+	@NotNull
 	@JoinColumn(nullable = false)
 	private CustomerEntity customer;
 
 	@ManyToOne
+	@NotNull
 	@JoinColumn(nullable = false)
 	private BookEntity book;
+
+	@NotNull
+	@Column(name = "date_of_borrowing")
+	private Date dateOfBorrowing;
+
+
+	public Date getDateOfBorrowing() {
+		return dateOfBorrowing;
+	}
+
+	public void setDateOfBorrowing(Date dateOfBorrowing) {
+		this.dateOfBorrowing = dateOfBorrowing;
+	}
 
 	public Long getId() {
 		return id;

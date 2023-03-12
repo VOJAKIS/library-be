@@ -3,106 +3,163 @@ package sk.umb.example.library.borrowing.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import sk.umb.example.library.book.controller.BookController;
-import sk.umb.example.library.customer.controller.CustomerController;
+import jakarta.transaction.Transactional;
+import sk.umb.example.library.book.persistence.entity.BookEntity;
+import sk.umb.example.library.book.persistence.repository.BookRepository;
+import sk.umb.example.library.book.service.BookDetailDataTransferObject;
+import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
+import sk.umb.example.library.borrowing.persistence.repository.BorrowingRepository;
+import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
+import sk.umb.example.library.customer.persistence.repository.CustomerRepository;
+import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
 
 @Service
 public class BorrowingService {
 	
-	private final List<BorrowingDetailDataTransferObject> borrowings = new ArrayList<>();
-	private Long lastIndex = 0L;
+	public final BorrowingRepository borrowingRepository;
+	public final CustomerRepository customerRepository;
+	public final BookRepository bookRepository;
 
-	public List<BorrowingDetailDataTransferObject> getAllBorrowings() {
-		return borrowings;
+	public BorrowingService(CustomerRepository customerRepository,
+							BookRepository bookRepository,
+							BorrowingRepository borrowingRepository) {
+		this.customerRepository = customerRepository;
+		this.bookRepository = bookRepository;
+		this.borrowingRepository = borrowingRepository;
 	}
 
-	public List<BorrowingDetailDataTransferObject> serachBorrowingsByBookName(String bookName) {
-		List<BorrowingDetailDataTransferObject> searchResult = new ArrayList<>();
-		for (BorrowingDetailDataTransferObject borrowing : borrowings) {
-			if (borrowing.getBook().getTitle().toLowerCase().contains(bookName.toLowerCase())) {
-				searchResult.add(borrowing);
-			}
-		}
-		return searchResult;
+	public List<BorrowingDetailDataTransferObject> getAllBorrowings() {
+		return mapToDataTransferObjectList(borrowingRepository.findAll());
+	}
+
+	public List<BorrowingDetailDataTransferObject> serachBorrowingsByBookName(String bookTitle) {
+		return mapToDataTransferObjectList(borrowingRepository.findByBookTitle(bookTitle));
 	}
 
 	public BorrowingDetailDataTransferObject getBorrowingById(Long borrowingId) {
-		if (borrowingId < 0) { return new BorrowingDetailDataTransferObject(); }
-		if (borrowingId >= lastIndex) { return new BorrowingDetailDataTransferObject(); }
-		for (BorrowingDetailDataTransferObject borrowing : borrowings) {
-			if (borrowing.getId().equals(borrowingId)) {
-				return borrowing;
+		return mapToDataTransferObject(getBorrowingEntityById(borrowingId));
+	}
+
+	@Transactional
+	public Long createBorrowing(BorrowingRequestDataTransferObject borrowingRequestDataTransferObject) {
+		BorrowingEntity borrowingEntity = mapToEntity(borrowingRequestDataTransferObject);
+
+		return borrowingRepository.save(borrowingEntity).getId();
+	}
+
+	@Transactional
+	public void updateBorrowing(Long borrowingId, BorrowingRequestDataTransferObject borrowingRequestDataTransferObject) {
+		BorrowingEntity borrowing = getBorrowingEntityById(borrowingId);
+
+		if (! Objects.isNull(borrowingRequestDataTransferObject.getCustomerId())) {
+			Optional<CustomerEntity> customerEntity = customerRepository.findById(borrowingRequestDataTransferObject.getCustomerId());
+			if (customerEntity.isPresent()) {
+				borrowing.setCustomer(customerEntity.get());
 			}
 		}
-		return new BorrowingDetailDataTransferObject();
-	}
 
-	public Long createBorrowing(BorrowingRequestDataTransferObject borrowing) {
-		BorrowingDetailDataTransferObject borrowingDataTransferObject = mapToBorrowingDataTransferObject(borrowing);
-		if (borrowingDataTransferObject == null) { return null; }
-		borrowingDataTransferObject.setId(lastIndex);
+		if (! Objects.isNull(borrowingRequestDataTransferObject.getBookId())) {
 
-		increaseIndexByOne();
-		printLastIndex();
-
-		borrowings.add(borrowingDataTransferObject);
-
-		return borrowingDataTransferObject.getId();
-	}
-
-	private void increaseIndexByOne() {
-		lastIndex++;
-	}
-	private void printLastIndex() {
-		System.out.println("Last index: " + lastIndex);
-	}
-
-	private BorrowingDetailDataTransferObject mapToBorrowingDataTransferObject(BorrowingRequestDataTransferObject borrowing) {
-		BorrowingDetailDataTransferObject borrowingDataTransferObject = new BorrowingDetailDataTransferObject();
-		
-		// >FeelsGood moment
-		Long customerId = borrowing.getCustomerId();
-		if (customerId == null) { return null; }
-		Long bookId = borrowing.getBookId();
-		if (bookId == null) { return null; }
-		borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
-		borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
-		borrowingDataTransferObject.setDateOfBorrowing(new Date());
-
-		return borrowingDataTransferObject;
-	}
-
-	public void updateBorrowing(Long borrowingId, BorrowingRequestDataTransferObject borrowing) {
-		if (borrowingId < 0) { return; }
-		if (borrowingId >= lastIndex) { return; }
-		
-		for (BorrowingDetailDataTransferObject borrowingDataTransferObject : borrowings) {
-			if (borrowingDataTransferObject.getId().equals(borrowingId)) {
-				Long customerId = borrowing.getCustomerId();
-				if (customerId == null) { return; }
-				Long bookId = borrowing.getBookId();
-				if (bookId == null) { return; }
-				borrowingDataTransferObject.setCustomer(CustomerController.customerServiceGlobal.getCustomerById(customerId));
-				borrowingDataTransferObject.setBook(BookController.bookServiceGlobal.getBookById(bookId));
-				borrowingDataTransferObject.setDateOfBorrowing(new Date());
-				return;
+			Optional<BookEntity> bookEntity = bookRepository.findById(borrowingRequestDataTransferObject.getBookId());
+			if (bookEntity.isPresent()) {
+				borrowing.setBook(bookEntity.get());
 			}
 		}
+
+		borrowing.setDateOfBorrowing(new Date());
+
+		borrowingRepository.save(null);
 	}
 
+	@Transactional
 	public void deleteBorrowing(Long borrowingId) {
-		if (borrowingId < 0) { return; }
-		if (borrowingId >= lastIndex) { return; }
+		borrowingRepository.deleteById(borrowingId);
+	}
 
-		for (BorrowingDetailDataTransferObject borrowingFromList : borrowings) {
-			if (borrowingFromList.getId().equals(borrowingId)) {
-				borrowings.remove(borrowingFromList);
-				return;
+	private BorrowingEntity getBorrowingEntityById(Long borrowingId) {
+		Optional<BorrowingEntity> borrowing = borrowingRepository.findById(borrowingId);
+
+        if (borrowing.isEmpty()) {
+            throw new IllegalArgumentException("Customer not found. ID: " + borrowingId);
+        }
+
+        return borrowing.get();
+	}
+
+	private List<BorrowingDetailDataTransferObject> mapToDataTransferObjectList(List<BorrowingEntity> borrowingEntities) {
+		List<BorrowingDetailDataTransferObject> borrowingDetailDataTransferObjects = new ArrayList<>();
+	
+		borrowingEntities.forEach(borrowingEntity -> {
+			BorrowingDetailDataTransferObject borrowingDetailDataTransferObject = mapToDataTransferObject(borrowingEntity);
+			borrowingDetailDataTransferObjects.add(borrowingDetailDataTransferObject);
+		});
+	
+		return borrowingDetailDataTransferObjects;
+	}
+
+	private BorrowingEntity mapToEntity(BorrowingRequestDataTransferObject borrowing) {
+		BorrowingEntity borrowingEntity = new BorrowingEntity();
+
+		if (! Objects.isNull(borrowing.getBookId())) {
+			Optional<BookEntity> bookEntity = bookRepository.findById(borrowing.getBookId());
+
+			if (bookEntity.isPresent()) {
+				borrowingEntity.setBook(bookEntity.get());
 			}
 		}
+
+		if (! Objects.isNull(borrowing.getCustomerId())) {
+			Optional<CustomerEntity> customerEntity = customerRepository.findById(borrowing.getCustomerId());
+
+			if (customerEntity.isPresent()) {
+				borrowingEntity.setCustomer(customerEntity.get());
+			}
+		}
+
+		borrowingEntity.setDateOfBorrowing(new Date());
+
+		return borrowingEntity;
 	}
+
+	private BorrowingDetailDataTransferObject mapToDataTransferObject(BorrowingEntity borrowingEntity) {
+        BorrowingDetailDataTransferObject borrowing = new BorrowingDetailDataTransferObject();
+        
+		borrowing.setId(borrowingEntity.getId());
+        borrowing.setCustomer(mapToDataTransferObject(borrowingEntity.getCustomer()));
+		borrowing.setBook(mapToDataTransferObject(borrowingEntity.getBook()));
+		borrowing.setDateOfBorrowing(borrowingEntity.getDateOfBorrowing());
+
+        return borrowing;
+    }
+
+	private BookDetailDataTransferObject mapToDataTransferObject(BookEntity bookEntity) {
+		BookDetailDataTransferObject book = new BookDetailDataTransferObject();
+
+		book.setId(bookEntity.getId());
+		book.setAuthorFirstName(bookEntity.getAuthorFirstName());
+		book.setAuthorLastName(bookEntity.getAuthorLastName());
+		book.setTitle(bookEntity.getTitle());
+		book.setIsbn(bookEntity.getIsbn());
+		book.setBookCount(bookEntity.getBookCount());
+		book.setCategoryIds(bookEntity.getCategoryIds());
+
+		return book;
+	}
+
+	private CustomerDetailDataTransferObject mapToDataTransferObject(CustomerEntity customerEntity) {
+        CustomerDetailDataTransferObject customer = new CustomerDetailDataTransferObject();
+
+        customer.setId(customerEntity.getId());
+        customer.setFirstName(customerEntity.getFirstName());
+        customer.setLastName(customerEntity.getLastName());
+        customer.setContactEmail(customerEntity.getContactEmail());
+
+        return customer;
+    }
 
 }
