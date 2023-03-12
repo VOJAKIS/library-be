@@ -54,12 +54,12 @@ public class BorrowingService {
 
 	@Transactional
 	public void updateBorrowing(Long borrowingId, BorrowingRequestDataTransferObject borrowingRequestDataTransferObject) {
-		BorrowingEntity borrowing = getBorrowingEntityById(borrowingId);
+		BorrowingEntity borrowingEntity = getBorrowingEntityById(borrowingId);
 
 		if (! Objects.isNull(borrowingRequestDataTransferObject.getCustomerId())) {
 			Optional<CustomerEntity> customerEntity = customerRepository.findById(borrowingRequestDataTransferObject.getCustomerId());
 			if (customerEntity.isPresent()) {
-				borrowing.setCustomer(customerEntity.get());
+				borrowingEntity.setCustomer(customerEntity.get());
 			}
 		}
 
@@ -67,13 +67,13 @@ public class BorrowingService {
 
 			Optional<BookEntity> bookEntity = bookRepository.findById(borrowingRequestDataTransferObject.getBookId());
 			if (bookEntity.isPresent()) {
-				borrowing.setBook(bookEntity.get());
+				borrowingEntity.setBook(bookEntity.get());
 			}
 		}
 
-		borrowing.setDateOfBorrowing(new Date());
+		borrowingEntity.setDateOfBorrowing(new Date());
 
-		borrowingRepository.save(null);
+		borrowingRepository.save(borrowingEntity);
 	}
 
 	@Transactional

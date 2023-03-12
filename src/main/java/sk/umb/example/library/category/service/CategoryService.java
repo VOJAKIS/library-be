@@ -63,7 +63,8 @@ public class CategoryService {
     private CategoryEntity getCategoryEntityById(Long categoryId) {
         Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
 
-        if(!categoryEntity.isEmpty()) {
+		// ERROR: Zlá podmienka
+        if(categoryEntity.isEmpty()) {
             throw new IllegalArgumentException("Couldn't find category with ID: " + categoryId);
         }
         
