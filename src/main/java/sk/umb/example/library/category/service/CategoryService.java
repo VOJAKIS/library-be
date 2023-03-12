@@ -1,5 +1,6 @@
 package sk.umb.example.library.category.service;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -19,10 +20,6 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-
-    private final List<CategoryDetailDataTransferObject> categories =  new ArrayList<>();
-    private Long lastIndex = 0L;
-
     public List<CategoryDetailDataTransferObject> getCategories() {
         return mapToDataTransferObjectList(categoryRepository.findAll());
     }
@@ -38,19 +35,13 @@ public class CategoryService {
         return categoryRepository.save(categoryEntity).getId();
     }
 
-    private void increaseIndexByOne() {
-		lastIndex++;
-	}
-	private void printLastIndex() {
-		System.out.println("Last index: " + lastIndex);
-	}
-
     @Transactional
-    public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
+    public void updateCategory(Long categoryId, CategoryRequestDataTransferObject categoryRequestDataTransferObject) {
         CategoryEntity categoryEntity = getCategoryEntityById(categoryId);
         
-        //TODO: Pridat validaciu ze je aktualizovany subor spravny
-
+		if (! Strings.isEmpty(categoryRequestDataTransferObject.getName())) {
+			categoryEntity.setName(categoryRequestDataTransferObject.getName());
+		}
         
         categoryRepository.save(categoryEntity);
     }
@@ -63,7 +54,7 @@ public class CategoryService {
 
     private CategoryEntity mapToEntity(CategoryRequestDataTransferObject category) {
         CategoryEntity categoryEntity = new CategoryEntity();
-        categoryEntity.setName(getCategoryById(lastIndex).getName());
+        categoryEntity.setName(category.getName());
 
         return categoryEntity;
     }
@@ -73,18 +64,18 @@ public class CategoryService {
         Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
 
         if(!categoryEntity.isEmpty()) {
-            throw new IllegalArgumentException("Couldn't find category with ID:" + categoryId);
+            throw new IllegalArgumentException("Couldn't find category with ID: " + categoryId);
         }
-        return categoryEntity.get();
-
+        
+		return categoryEntity.get();
     }
     
     private List<CategoryDetailDataTransferObject> mapToDataTransferObjectList(Iterable<CategoryEntity> categoryEntities) {
         List<CategoryDetailDataTransferObject> categories = new ArrayList<>();
 
         categoryEntities.forEach(categoryEntity -> {
-            CategoryDetailDataTransferObject categoryDDTO = mapToDataTransferObject(categoryEntity);
-            categories.add(categoryDDTO);
+            CategoryDetailDataTransferObject categoryDetailDataTransferObject = mapToDataTransferObject(categoryEntity);
+            categories.add(categoryDetailDataTransferObject);
         });
 
         return categories;
