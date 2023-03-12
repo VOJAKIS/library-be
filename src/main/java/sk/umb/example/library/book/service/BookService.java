@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import sk.umb.example.library.book.persistence.entity.BookEntity;
 import sk.umb.example.library.book.persistence.repository.BookRepository;
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
+import sk.umb.example.library.category.persistence.repository.CategoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -15,10 +18,12 @@ public class BookService {
 
     //? Konstruktor, inicializacia repozitaru
     private final BookRepository bookRepository;
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
+	private final CategoryRepository categoryRepository;
 
+    public BookService(BookRepository bookRepository, CategoryRepository categoryRepository) {
+        this.bookRepository = bookRepository;
+		this.categoryRepository = categoryRepository;
+    }
 
     //? Get operacie
     public List<BookDetailDataTransferObject> getBooks() {
@@ -31,13 +36,13 @@ public class BookService {
 
     public BookEntity getBookEntityById(Long bookId) {
         Optional<BookEntity> bookEntity = bookRepository.findById(bookId);
-        if(!bookEntity.isEmpty()) {
-            throw new IllegalArgumentException("Couldn't find book with ID:" + bookId);
+		// ERROR: Chybná podmienka
+        if (bookEntity.isEmpty()) {
+            throw new IllegalArgumentException("Couldn't find book with ID: " + bookId);
         }
 
         return bookEntity.get();
     }
-
 
     //? Post, Update, Delete
     @Transactional
@@ -47,11 +52,19 @@ public class BookService {
         return bookRepository.save(bookEntity).getId();
     }
 
+	// ERROR: Chýba zmena údajov == update
     @Transactional
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
         BookEntity bookEntity = getBookEntityById(bookId);
-        // TODO: Pridat validaciu ze je aktualizovany subor spravny
-        bookRepository.save(bookEntity);
+
+		bookEntity.setCategoryIds(mapToCategoryIds(book));
+		bookEntity.setAuthorFirstName(book.getAuthorFirstName());
+		bookEntity.setAuthorLastName(book.getAuthorLastName());
+		bookEntity.setBookCount(book.getBookCount());
+		bookEntity.setIsbn(book.getIsbn());
+		bookEntity.setTitle(book.getTitle());
+
+		bookRepository.save(bookEntity);
     }
 
     @Transactional
@@ -63,15 +76,32 @@ public class BookService {
     //? Mapping
     private BookEntity mapToEntity(BookRequestDataTransferObject book) {
         BookEntity bookEntity = new BookEntity();
+
         bookEntity.setAuthorFirstName(book.getAuthorFirstName());
         bookEntity.setAuthorLastName(book.getAuthorLastName());
         bookEntity.setTitle(book.getTitle());
         bookEntity.setIsbn(book.getIsbn());
         bookEntity.setBookCount(book.getBookCount());
-        bookEntity.setCategoryIds(book.getCategoryIds());
+        bookEntity.setCategoryIds(mapToCategoryIds(book));
 
         return bookEntity;
     }
+
+	private List<Long> mapToCategoryIds(BookRequestDataTransferObject book) {
+		List<Long> categoryIds = new ArrayList<>();
+
+		if (!Objects.isNull(book.getCategories())) {
+			book.getCategories().forEach(categoryId -> {
+				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
+				
+				if (categoryEntity.isPresent()) {
+					categoryIds.add(categoryEntity.get().getId());
+				}
+			});
+		}
+
+		return categoryIds;
+	}
 
     private BookDetailDataTransferObject mapToDataTransferObject(BookEntity bookEntity) {
         BookDetailDataTransferObject book = new BookDetailDataTransferObject();
@@ -82,7 +112,7 @@ public class BookService {
         book.setTitle(bookEntity.getTitle());
         book.setIsbn(bookEntity.getIsbn());
         book.setBookCount(bookEntity.getBookCount());
-        book.setCategoryIds(bookEntity.getCategoryIds());
+		book.setCategories(bookEntity.getCategoryIds());
 
         return book;
     }
@@ -91,8 +121,8 @@ public class BookService {
         List<BookDetailDataTransferObject> books = new ArrayList<>();
 
         bookEntities.forEach(categoryEntity -> {
-            BookDetailDataTransferObject bookDDTO = mapToDataTransferObject(categoryEntity);
-            books.add(bookDDTO);
+            BookDetailDataTransferObject bookDetailDataTransferObject = mapToDataTransferObject(categoryEntity);
+            books.add(bookDetailDataTransferObject);
         });
 
         return books;

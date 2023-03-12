@@ -2,6 +2,8 @@ package sk.umb.example.library.book.service;
 
 import java.util.List;
 
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
+
 public class BookDetailDataTransferObject {
     private Long id;
     private String authorFirstName;
@@ -9,15 +11,15 @@ public class BookDetailDataTransferObject {
     private String title;
     private String isbn;
     private Integer bookCount;
-    private List<Integer> categoryIds;
+    private List<Long> categories;
 
 
-    public List<Integer> getCategoryIds() {
-        return categoryIds;
+    public List<Long> getCategories() {
+        return categories;
     }
 
-    public void setCategoryIds(List<Integer> categoryIds) {
-        this.categoryIds = categoryIds;
+    public void setCategories(List<Long> categories) {
+        this.categories = categories;
     }
 
     public Long getId() {

@@ -54,6 +54,7 @@ public class CategoryService {
 
     private CategoryEntity mapToEntity(CategoryRequestDataTransferObject category) {
         CategoryEntity categoryEntity = new CategoryEntity();
+		
         categoryEntity.setName(category.getName());
 
         return categoryEntity;

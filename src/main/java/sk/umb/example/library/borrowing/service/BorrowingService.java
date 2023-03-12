@@ -14,6 +14,7 @@ import sk.umb.example.library.book.persistence.repository.BookRepository;
 import sk.umb.example.library.book.service.BookDetailDataTransferObject;
 import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
 import sk.umb.example.library.borrowing.persistence.repository.BorrowingRepository;
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 import sk.umb.example.library.customer.persistence.repository.CustomerRepository;
 import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
@@ -146,9 +147,19 @@ public class BorrowingService {
 		book.setTitle(bookEntity.getTitle());
 		book.setIsbn(bookEntity.getIsbn());
 		book.setBookCount(bookEntity.getBookCount());
-		book.setCategoryIds(bookEntity.getCategoryIds());
+		book.setCategories(bookEntity.getCategoryIds());
 
 		return book;
+	}
+
+	private List<Long> mapToCategoryIds(List<CategoryEntity> categories) {
+		List<Long> categoryIds = new ArrayList<>();
+
+		categories.forEach(categoryEntity -> {
+			categoryIds.add(categoryEntity.getId());
+		});
+
+		return categoryIds;
 	}
 
 	private CustomerDetailDataTransferObject mapToDataTransferObject(CustomerEntity customerEntity) {

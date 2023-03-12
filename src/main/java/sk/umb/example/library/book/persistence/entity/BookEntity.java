@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
 
 
 @Entity(name = "book")
@@ -31,9 +32,11 @@ public class BookEntity {
     @Column(name = "book_count")
     private Integer bookCount;
 
-    @Column(name = "categories")
-    private List<Integer> categoryIds;
-    
+    /* @Column(name = "categories")
+    private List<Long> categoryIds; */
+
+	@Column(name = "id_categories")
+	private List<Long> categories;
 
 
     public Long getId() {
@@ -84,12 +87,12 @@ public class BookEntity {
         this.bookCount = bookCount;
     }
 
-    public List<Integer> getCategoryIds() {
-        return this.categoryIds;
+    public List<Long> getCategoryIds() {
+        return this.categories;
     }
 
-    public void setCategoryIds(List<Integer> categoryIds) {
-        this.categoryIds = categoryIds;
+    public void setCategoryIds(List<Long> categoryIds) {
+        this.categories = categoryIds;
     }    
 
 }

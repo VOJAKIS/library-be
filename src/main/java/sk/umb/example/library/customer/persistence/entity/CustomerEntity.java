@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-// import jakarta.persistence.ManyToOne;
-// import sk.umb.example.library.address.persistence.entity.AddressEntity;
 
 @Entity(name = "customer")
 public class CustomerEntity {

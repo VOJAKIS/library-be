@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
 import sk.umb.example.library.book.persistence.entity.BookEntity;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 
@@ -20,16 +19,13 @@ public class BorrowingEntity {
 	private Long id;
 
 	@ManyToOne
-	@NotNull
-	@JoinColumn(nullable = false)
+	@JoinColumn(name = "id_customer", nullable = false)
 	private CustomerEntity customer;
 
 	@ManyToOne
-	@NotNull
-	@JoinColumn(nullable = false)
+	@JoinColumn(name = "id_book", nullable = false)
 	private BookEntity book;
 
-	@NotNull
 	@Column(name = "date_of_borrowing")
 	private Date dateOfBorrowing;
 
