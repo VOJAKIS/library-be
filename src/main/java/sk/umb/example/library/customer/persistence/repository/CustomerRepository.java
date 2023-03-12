@@ -6,5 +6,5 @@ import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 
 @Repository
 public interface CustomerRepository extends CrudRepository<CustomerEntity, Long> {
-	
+	Iterable<CustomerEntity> findByLastName(String lastName);
 }

@@ -31,10 +31,10 @@ public class CustomerController {
 	public List<CustomerDetailDataTransferObject> searchCustomer(@RequestParam(required = false) String lastName) {
 		if (lastName == null) {
 			System.out.println("Search customer was called.");
-			return customerService.getCustomers();
+			return customerService.getAllCustomers();
 		} else {
 			System.out.println("Search customer was called, " + lastName);
-			return customerService.getCustomers(lastName);
+			return customerService.getCustomersByLastName(lastName);
 		}
 	}
 

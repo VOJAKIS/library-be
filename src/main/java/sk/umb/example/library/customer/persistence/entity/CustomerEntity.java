@@ -4,21 +4,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-// import jakarta.persistence.ManyToOne;
-// import sk.umb.example.library.address.persistence.entity.AddressEntity;
 
 @Entity(name = "customer")
 public class CustomerEntity {
-    @Id
-    @GeneratedValue
+	@Id
+	@GeneratedValue
+	@Column(name = "id_customer", unique = true)
     private Long id;
 
+	@Column(name = "first_name")
     private String firstName;
-
+		
+	@Column(name = "last_name")
     private String lastName;
 
-		@Column(name = "contact_email")
-    private String emailContact;
+	@Column(name = "contact_email")
+    private String contactEmail;
 
     public Long getId() {
         return id;
@@ -44,11 +45,11 @@ public class CustomerEntity {
         this.lastName = lastName;
     }
 
-    public String getEmailContact() {
-        return emailContact;
+    public String getContactEmail() {
+        return contactEmail;
     }
 
-    public void setEmailContact(String emailContact) {
-        this.emailContact = emailContact;
+    public void setContactEmail(String emailContact) {
+        this.contactEmail = emailContact;
     }
 }

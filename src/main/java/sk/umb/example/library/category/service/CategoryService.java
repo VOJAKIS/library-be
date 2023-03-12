@@ -1,84 +1,94 @@
 package sk.umb.example.library.category.service;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
+import sk.umb.example.library.category.persistence.repository.CategoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
 
-    private final List<CategoryDetailDataTransferObject> categories =  new ArrayList<>();
-    private Long lastIndex = 0L;
+    private final CategoryRepository categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     public List<CategoryDetailDataTransferObject> getCategories() {
-        return categories;
+        return mapToDataTransferObjectList(categoryRepository.findAll());
     }
 
     public CategoryDetailDataTransferObject getCategoryById(Long categoryId) {
-        if (categoryId < 0) { return new CategoryDetailDataTransferObject(); }
-        if (categoryId >= lastIndex) { return new CategoryDetailDataTransferObject(); }
-
-        for (CategoryDetailDataTransferObject category : categories) {
-			if (category.getId().equals(categoryId)) {
-				return category;
-			}
-		}
-		
-		return new CategoryDetailDataTransferObject();
+        return mapToDataTransferObject(getCategoryEntityById(categoryId));
     }
 
+    @Transactional
     public Long createCategory(CategoryRequestDataTransferObject category) {
-        CategoryDetailDataTransferObject categoryDataTransferObject = mapToCategoryDataTransferObject(category);
-        categoryDataTransferObject.setId(lastIndex);
+        CategoryEntity categoryEntity = mapToEntity(category);
 
-        increaseIndexByOne();
-        printLastIndex();
-
-        categories.add(categoryDataTransferObject);
-
-        return categoryDataTransferObject.getId();
+        return categoryRepository.save(categoryEntity).getId();
     }
 
-    private void increaseIndexByOne() {
-		lastIndex++;
-	}
-	private void printLastIndex() {
-		System.out.println("Last index: " + lastIndex);
-	}
-
-
-    private CategoryDetailDataTransferObject mapToCategoryDataTransferObject(CategoryRequestDataTransferObject category) {
-        CategoryDetailDataTransferObject categoryDataTransferObject = new CategoryDetailDataTransferObject();
+    @Transactional
+    public void updateCategory(Long categoryId, CategoryRequestDataTransferObject categoryRequestDataTransferObject) {
+        CategoryEntity categoryEntity = getCategoryEntityById(categoryId);
         
-        categoryDataTransferObject.setName(category.getName());
-
-        return categoryDataTransferObject;
-    }
-
-    public void updateCategory(Long categoryId, CategoryRequestDataTransferObject category) {
-        if (categoryId < 0) { return; }
-		if (categoryId >= lastIndex) { return; }
-
-        for(CategoryDetailDataTransferObject categoryDataTransferObject : categories) {
-            if(categoryDataTransferObject.getId().equals(categoryId)) {
-                categoryDataTransferObject.setName(category.getName());
-                return;
-            }
-        }
-    }
-
-    public void deleteCategory(Long categoryId) {
-        if (categoryId < 0) { return; }
-		if (categoryId >= lastIndex) { return; }
-
-		for (CategoryDetailDataTransferObject categoryFromList : categories) {
-			if (categoryFromList.getId().equals(categoryId)) {
-				categories.remove(categoryFromList);
-				return;
-			}
+		if (! Strings.isEmpty(categoryRequestDataTransferObject.getName())) {
+			categoryEntity.setName(categoryRequestDataTransferObject.getName());
 		}
+        
+        categoryRepository.save(categoryEntity);
+    }
+
+    @Transactional
+    public void deleteCategory(Long categoryId) {
+        categoryRepository.deleteById(categoryId);
     }
 
 
+    private CategoryEntity mapToEntity(CategoryRequestDataTransferObject category) {
+        CategoryEntity categoryEntity = new CategoryEntity();
+		
+        categoryEntity.setName(category.getName());
+
+        return categoryEntity;
+    }
+
+
+    private CategoryEntity getCategoryEntityById(Long categoryId) {
+        Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
+
+		// ERROR: Zlá podmienka
+        if(categoryEntity.isEmpty()) {
+            throw new IllegalArgumentException("Couldn't find category with ID: " + categoryId);
+        }
+        
+		return categoryEntity.get();
+    }
+    
+    private List<CategoryDetailDataTransferObject> mapToDataTransferObjectList(Iterable<CategoryEntity> categoryEntities) {
+        List<CategoryDetailDataTransferObject> categories = new ArrayList<>();
+
+        categoryEntities.forEach(categoryEntity -> {
+            CategoryDetailDataTransferObject categoryDetailDataTransferObject = mapToDataTransferObject(categoryEntity);
+            categories.add(categoryDetailDataTransferObject);
+        });
+
+        return categories;
+    }
+
+    private CategoryDetailDataTransferObject mapToDataTransferObject(CategoryEntity categoryEntity) {
+        CategoryDetailDataTransferObject category = new CategoryDetailDataTransferObject();
+
+        category.setId(categoryEntity.getId());
+        category.setName(categoryEntity.getName());
+
+        return category;
+    }
 }
