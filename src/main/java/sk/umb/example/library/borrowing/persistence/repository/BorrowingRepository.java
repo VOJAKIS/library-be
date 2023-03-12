@@ -1,5 +1,11 @@
 package sk.umb.example.library.borrowing.persistence.repository;
 
-public class BorrowingRepository {
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
+
+@Repository
+public interface BorrowingRepository extends CrudRepository<BorrowingEntity, Long> {
 	
 }
