@@ -16,9 +16,11 @@ public class BorrowingEntity {
 	private Long id;
 
 	@ManyToOne
+	@Column(nullable = false)
 	private CustomerEntity customer;
 
 	@ManyToOne
+	@Column(nullable = false)
 	private BookEntity book;
 
 	public Long getId() {
@@ -44,7 +46,4 @@ public class BorrowingEntity {
 	public void setBook(BookEntity book) {
 		this.book = book;
 	}
-
-	
-
 }
