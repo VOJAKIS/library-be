@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import sk.umb.example.library.book.persistence.entity.BookEntity;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
@@ -16,11 +17,11 @@ public class BorrowingEntity {
 	private Long id;
 
 	@ManyToOne
-	@Column(nullable = false)
+	@JoinColumn(nullable = false)
 	private CustomerEntity customer;
 
 	@ManyToOne
-	@Column(nullable = false)
+	@JoinColumn(nullable = false)
 	private BookEntity book;
 
 	public Long getId() {
