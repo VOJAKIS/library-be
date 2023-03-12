@@ -15,6 +15,7 @@ import sk.umb.example.library.book.service.BookDetailDataTransferObject;
 import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
 import sk.umb.example.library.borrowing.persistence.repository.BorrowingRepository;
 import sk.umb.example.library.category.persistence.entity.CategoryEntity;
+import sk.umb.example.library.category.persistence.repository.CategoryRepository;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 import sk.umb.example.library.customer.persistence.repository.CustomerRepository;
 import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
@@ -22,16 +23,19 @@ import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
 @Service
 public class BorrowingService {
 	
-	public final BorrowingRepository borrowingRepository;
-	public final CustomerRepository customerRepository;
-	public final BookRepository bookRepository;
+	private final BorrowingRepository borrowingRepository;
+	private final CustomerRepository customerRepository;
+	private final BookRepository bookRepository;
+	private final CategoryRepository categoryRepository;
 
 	public BorrowingService(CustomerRepository customerRepository,
 							BookRepository bookRepository,
-							BorrowingRepository borrowingRepository) {
+							BorrowingRepository borrowingRepository,
+							CategoryRepository categoryRepository) {
 		this.customerRepository = customerRepository;
 		this.bookRepository = bookRepository;
 		this.borrowingRepository = borrowingRepository;
+		this.categoryRepository = categoryRepository;
 	}
 
 	public List<BorrowingDetailDataTransferObject> getAllBorrowings() {
@@ -43,7 +47,7 @@ public class BorrowingService {
 	}
 
 	public BorrowingDetailDataTransferObject getBorrowingById(Long borrowingId) {
-		return mapToDataTransferObject(getBorrowingEntityById(borrowingId));
+		return mapToBorrowingDetailDataTransferObject(getBorrowingEntityById(borrowingId));
 	}
 
 	@Transactional
@@ -96,7 +100,7 @@ public class BorrowingService {
 		List<BorrowingDetailDataTransferObject> borrowingDetailDataTransferObjects = new ArrayList<>();
 	
 		borrowingEntities.forEach(borrowingEntity -> {
-			BorrowingDetailDataTransferObject borrowingDetailDataTransferObject = mapToDataTransferObject(borrowingEntity);
+			BorrowingDetailDataTransferObject borrowingDetailDataTransferObject = mapToBorrowingDetailDataTransferObject(borrowingEntity);
 			borrowingDetailDataTransferObjects.add(borrowingDetailDataTransferObject);
 		});
 	
@@ -127,18 +131,18 @@ public class BorrowingService {
 		return borrowingEntity;
 	}
 
-	private BorrowingDetailDataTransferObject mapToDataTransferObject(BorrowingEntity borrowingEntity) {
+	private BorrowingDetailDataTransferObject mapToBorrowingDetailDataTransferObject(BorrowingEntity borrowingEntity) {
         BorrowingDetailDataTransferObject borrowing = new BorrowingDetailDataTransferObject();
         
 		borrowing.setId(borrowingEntity.getId());
         borrowing.setCustomer(mapToDataTransferObject(borrowingEntity.getCustomer()));
-		borrowing.setBook(mapToDataTransferObject(borrowingEntity.getBook()));
+		borrowing.setBook(mapToBookDetailDataTransferObject(borrowingEntity.getBook()));
 		borrowing.setDateOfBorrowing(borrowingEntity.getDateOfBorrowing());
 
         return borrowing;
     }
 
-	private BookDetailDataTransferObject mapToDataTransferObject(BookEntity bookEntity) {
+	private BookDetailDataTransferObject mapToBookDetailDataTransferObject(BookEntity bookEntity) {
 		BookDetailDataTransferObject book = new BookDetailDataTransferObject();
 
 		book.setId(bookEntity.getId());
@@ -147,17 +151,23 @@ public class BorrowingService {
 		book.setTitle(bookEntity.getTitle());
 		book.setIsbn(bookEntity.getIsbn());
 		book.setBookCount(bookEntity.getBookCount());
-		book.setCategories(bookEntity.getCategoryIds());
+		book.setCategories(mapToCategoryIds(bookEntity));
 
 		return book;
 	}
 
-	private List<Long> mapToCategoryIds(List<CategoryEntity> categories) {
+	private List<Long> mapToCategoryIds(BookEntity bookEntity) {
 		List<Long> categoryIds = new ArrayList<>();
 
-		categories.forEach(categoryEntity -> {
-			categoryIds.add(categoryEntity.getId());
-		});
+		if (!Objects.isNull(bookEntity.getCategoryIds())) {
+			bookEntity.getCategoryIds().forEach(categoryId -> {
+				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
+				
+				if (categoryEntity.isPresent()) {
+					categoryIds.add(categoryEntity.get().getId());
+				}
+			});
+		}
 
 		return categoryIds;
 	}

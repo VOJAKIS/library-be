@@ -6,8 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import sk.umb.example.library.category.persistence.entity.CategoryEntity;
-
 
 @Entity(name = "book")
 public class BookEntity {

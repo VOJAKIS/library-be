@@ -2,8 +2,6 @@ package sk.umb.example.library.book.service;
 
 import java.util.List;
 
-import sk.umb.example.library.category.persistence.entity.CategoryEntity;
-
 public class BookDetailDataTransferObject {
     private Long id;
     private String authorFirstName;
