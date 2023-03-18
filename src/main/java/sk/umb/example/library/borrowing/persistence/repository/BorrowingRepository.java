@@ -14,4 +14,8 @@ public interface BorrowingRepository extends CrudRepository<BorrowingEntity, Lon
 
 	List<BorrowingEntity> findByBookTitle(String bookTitle);
 
+	Iterable<BorrowingEntity> findAllByCustomerId(Long customerId);
+
+	Iterable<BorrowingEntity> findAllByBookId(Long bookId);
+
 }

@@ -11,4 +11,6 @@ public interface CategoryRepository extends CrudRepository<CategoryEntity, Long>
     //FIXME: Optional → Iterable, len aktualne to nefunguje
     // Iterable<CategoryEntity> findById(String categoryId);
 	Optional<CategoryEntity> findById(Long categoryId);
+
+	Iterable<CategoryEntity> findAllByName(String categoryName);
 }

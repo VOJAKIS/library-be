@@ -16,33 +16,35 @@ public class CategoryController {
 		this.categoryService = categoryService;
 	}
 
-	@GetMapping("/api/categories")
-	public List<CategoryDetailDataTransferObject> searchCategory(@RequestParam(required = false) String categoryName) {
-		System.out.println("Search categories was called: " + categoryName);
-		return categoryService.getCategories();
+	@GetMapping("/api/bookCategories")
+	public List<CategoryDetailDataTransferObject> getCategories(@RequestParam(required = false) String categoryName) {
+		System.out.println("Search book categories was called: " + categoryName);
+		return (Strings.isEmpty(categoryName)) ? 
+			categoryService.getAllCategories() :
+			categoryService.searchCategoriesByName(categoryName);
 	}
 
-	@GetMapping("/api/categories/{categoryId}")
-	public CategoryDetailDataTransferObject getCategory(@PathVariable Long categoryId) {
-		System.out.println("Get category was called, " + categoryId);
-		return categoryService.getCategoryById(categoryId);
+	@GetMapping("/api/bookCategories/{bookCategoryId}")
+	public CategoryDetailDataTransferObject getCategory(@PathVariable Long bookCategoryId) {
+		System.out.println("Get book category was called, " + bookCategoryId);
+		return categoryService.getCategoryById(bookCategoryId);
 	}
 
-	@PostMapping("/api/categories")
+	@PostMapping("/api/bookCategories")
 	public String createCategory(@RequestBody CategoryRequestDataTransferObject category) {
-		System.out.println("Create category was called.");
+		System.out.println("Create book category was called.");
 		return "id: " + categoryService.createCategory(category);
 	}
 
-	@PutMapping("/api/categories/{categoryId}")
-	public void updateCategory(@PathVariable Long categoryId, @RequestBody CategoryRequestDataTransferObject category) {
-		System.out.println("Update category was called, " + categoryId);
-		categoryService.updateCategory(categoryId, category);
+	@PutMapping("/api/bookCategories/{bookCategoryId}")
+	public void updateCategory(@PathVariable Long bookCategoryId, @RequestBody CategoryRequestDataTransferObject category) {
+		System.out.println("Update book category was called, " + bookCategoryId);
+		categoryService.updateCategory(bookCategoryId, category);
 	}
 
-	@DeleteMapping("/api/categories/{categoryId}")
-	public void deleteCategory(@PathVariable Long categoryId) {
-		System.out.println("Delte category was called, " + categoryId);
-		categoryService.deleteCategory(categoryId);
+	@DeleteMapping("/api/bookCategories/{bookCategoryId}")
+	public void deleteCategory(@PathVariable Long bookCategoryId) {
+		System.out.println("Delte book category was called, " + bookCategoryId);
+		categoryService.deleteCategory(bookCategoryId);
 	}
 }
