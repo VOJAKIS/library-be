@@ -20,13 +20,9 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<CategoryDetailDataTransferObject> getAllCategories() {
+    public List<CategoryDetailDataTransferObject> getCategories() {
         return mapToDataTransferObjectList(categoryRepository.findAll());
     }
-
-	public List<CategoryDetailDataTransferObject> searchCategoriesByName(String categoryName) {
-		return mapToDataTransferObjectList(categoryRepository.findAllByName(categoryName));
-	}
 
     public CategoryDetailDataTransferObject getCategoryById(Long categoryId) {
         return mapToDataTransferObject(getCategoryEntityById(categoryId));
