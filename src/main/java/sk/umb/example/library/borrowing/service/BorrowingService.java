@@ -16,6 +16,7 @@ import sk.umb.example.library.borrowing.persistence.entity.BorrowingEntity;
 import sk.umb.example.library.borrowing.persistence.repository.BorrowingRepository;
 import sk.umb.example.library.category.persistence.entity.CategoryEntity;
 import sk.umb.example.library.category.persistence.repository.CategoryRepository;
+import sk.umb.example.library.category.service.CategoryDetailDataTransferObject;
 import sk.umb.example.library.customer.persistence.entity.CustomerEntity;
 import sk.umb.example.library.customer.persistence.repository.CustomerRepository;
 import sk.umb.example.library.customer.service.CustomerDetailDataTransferObject;
@@ -42,8 +43,24 @@ public class BorrowingService {
 		return mapToDataTransferObjectList(borrowingRepository.findAll());
 	}
 
-	public List<BorrowingDetailDataTransferObject> serachBorrowingsByBookName(String bookTitle) {
-		return mapToDataTransferObjectList(borrowingRepository.findByBookTitle(bookTitle));
+	public List<BorrowingDetailDataTransferObject> searchBorrowingsByCustomerId(Long customerId) {
+		return mapToDataTransferObjectList(borrowingRepository.findAllByCustomerId(customerId));
+	}
+
+	public List<BorrowingDetailDataTransferObject> searchBorrowingsByBookId(Long bookId) {
+		return mapToDataTransferObjectList(borrowingRepository.findAllByBookId(bookId));
+	}
+
+	private List<BorrowingDetailDataTransferObject> mapToDataTransferObjectList(Iterable<BorrowingEntity> borrowingEntities) {
+		List<BorrowingDetailDataTransferObject> borrowings = new ArrayList<>();
+
+		if (! Objects.isNull(borrowingEntities)) {
+			borrowingEntities.forEach(borrowing -> {
+				borrowings.add(mapToBorrowingDetailDataTransferObject(borrowing));
+			});
+		}
+
+		return borrowings;
 	}
 
 	public BorrowingDetailDataTransferObject getBorrowingById(Long borrowingId) {
@@ -69,8 +86,8 @@ public class BorrowingService {
 		}
 
 		if (! Objects.isNull(borrowingRequestDataTransferObject.getBookId())) {
-
 			Optional<BookEntity> bookEntity = bookRepository.findById(borrowingRequestDataTransferObject.getBookId());
+
 			if (bookEntity.isPresent()) {
 				borrowingEntity.setBook(bookEntity.get());
 			}
@@ -151,17 +168,42 @@ public class BorrowingService {
 		book.setTitle(bookEntity.getTitle());
 		book.setIsbn(bookEntity.getIsbn());
 		book.setBookCount(bookEntity.getBookCount());
-		book.setCategories(mapToCategoryIds(bookEntity));
+		book.setCategories(mapToCategoryDetailList(bookEntity));
 
 		return book;
 	}
 
-	private List<Long> mapToCategoryIds(BookEntity bookEntity) {
+	private List<CategoryDetailDataTransferObject> mapToCategoryDetailList(BookEntity book) {
+		List<CategoryDetailDataTransferObject> categoryIds = new ArrayList<>();
+
+		if (!Objects.isNull(book.getCategories())) {
+			book.getCategories().forEach(categoryId -> {
+				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId.getId());
+				
+				if (categoryEntity.isPresent()) {
+					categoryIds.add(mapToCategoryDetail(categoryEntity.get()));
+				}
+			});
+		}
+
+		return categoryIds;
+	}
+
+	private CategoryDetailDataTransferObject mapToCategoryDetail(CategoryEntity categoryEntity) {
+        CategoryDetailDataTransferObject category = new CategoryDetailDataTransferObject();
+
+        category.setId(categoryEntity.getId());
+        category.setName(categoryEntity.getName());
+    
+       return category;
+    }
+
+	/* private List<Long> mapToCategoryIds(BookEntity bookEntity) {
 		List<Long> categoryIds = new ArrayList<>();
 
 		if (!Objects.isNull(bookEntity.getCategoryIds())) {
 			bookEntity.getCategoryIds().forEach(categoryId -> {
-				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
+				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId.getId());
 				
 				if (categoryEntity.isPresent()) {
 					categoryIds.add(categoryEntity.get().getId());
@@ -170,7 +212,7 @@ public class BorrowingService {
 		}
 
 		return categoryIds;
-	}
+	} */
 
 	private CustomerDetailDataTransferObject mapToDataTransferObject(CustomerEntity customerEntity) {
         CustomerDetailDataTransferObject customer = new CustomerDetailDataTransferObject();
@@ -182,5 +224,7 @@ public class BorrowingService {
 
         return customer;
     }
+
+	
 
 }

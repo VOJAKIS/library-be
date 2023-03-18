@@ -1,11 +1,17 @@
 package sk.umb.example.library.book.persistence.entity;
 
-import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import sk.umb.example.library.category.persistence.entity.CategoryEntity;
 
 @Entity(name = "book")
 public class BookEntity {
@@ -30,12 +36,24 @@ public class BookEntity {
     @Column(name = "book_count")
     private Integer bookCount;
 
-    /* @Column(name = "categories")
-    private List<Long> categoryIds; */
+	@Enumerated(EnumType.STRING)
+	@Column(name = "book_status")
+	private BookStatus bookStatus;
 
-	@Column(name = "id_categories")
-	private List<Long> categories;
+    @ManyToMany
+    @JoinTable(name="category_book",
+        joinColumns=@JoinColumn(name="id_book"),
+        inverseJoinColumns=@JoinColumn(name="id_category"))
+    private Set<CategoryEntity> categories;
 
+
+	public BookStatus getBookStatus() {
+		return bookStatus;
+	}
+
+	public void setBookStatus(BookStatus bookStatus) {
+		this.bookStatus = bookStatus;
+	}
 
     public Long getId() {
         return this.id;
@@ -85,12 +103,12 @@ public class BookEntity {
         this.bookCount = bookCount;
     }
 
-    public List<Long> getCategoryIds() {
+    public Set<CategoryEntity> getCategories() {
         return this.categories;
     }
 
-    public void setCategoryIds(List<Long> categoryIds) {
+    public void setCategories(Set<CategoryEntity> categoryIds) {
         this.categories = categoryIds;
-    }    
-
+    }
+	
 }

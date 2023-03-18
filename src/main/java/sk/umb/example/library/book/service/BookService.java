@@ -4,14 +4,18 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import sk.umb.example.library.book.persistence.entity.BookEntity;
+import sk.umb.example.library.book.persistence.entity.BookStatus;
 import sk.umb.example.library.book.persistence.repository.BookRepository;
 import sk.umb.example.library.category.persistence.entity.CategoryEntity;
 import sk.umb.example.library.category.persistence.repository.CategoryRepository;
+import sk.umb.example.library.category.service.CategoryDetailDataTransferObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class BookService {
@@ -49,6 +53,8 @@ public class BookService {
     public Long createBook(BookRequestDataTransferObject book) {
         BookEntity bookEntity = mapToEntity(book);
 
+		bookEntity.setBookStatus(mapToBookStatus(book.getBookCount()));
+
         return bookRepository.save(bookEntity).getId();
     }
 
@@ -57,12 +63,13 @@ public class BookService {
     public void updateBook(Long bookId, BookRequestDataTransferObject book) {
         BookEntity bookEntity = getBookEntityById(bookId);
 
-		bookEntity.setCategoryIds(mapToCategoryIds(book));
 		bookEntity.setAuthorFirstName(book.getAuthorFirstName());
 		bookEntity.setAuthorLastName(book.getAuthorLastName());
 		bookEntity.setBookCount(book.getBookCount());
 		bookEntity.setIsbn(book.getIsbn());
 		bookEntity.setTitle(book.getTitle());
+		bookEntity.setCategories(mapToCategoryEntitySet(book));
+		bookEntity.setBookStatus(mapToBookStatus(book.getBookCount()));
 
 		bookRepository.save(bookEntity);
     }
@@ -72,8 +79,41 @@ public class BookService {
         bookRepository.deleteById(bookId);
     }
 
+	@Transactional
+	public void addBookCategory(Long bookId, Long bookCategoryId) {
+		BookEntity bookEntity = getBookEntityById(bookId);
+		Set<CategoryEntity> categoryEntities = bookEntity.getCategories();
+
+		Optional<CategoryEntity> categoryEntity = categoryRepository.findById(bookCategoryId);
+		if (categoryEntity.isPresent()) {
+			categoryEntities.add(categoryEntity.get());
+		}
+
+		bookEntity.setCategories(categoryEntities);
+
+		bookRepository.save(bookEntity);
+	}
+
+	@Transactional
+	public void removeBookCategory(Long bookId, Long bookCategoryId) {
+		BookEntity bookEntity = getBookEntityById(bookId);
+
+		Set<CategoryEntity> categoryEntities = bookEntity.getCategories();
+
+		Optional<CategoryEntity> categoryEntity = categoryRepository.findById(bookCategoryId);
+		if (categoryEntity.isPresent()) {
+			categoryEntities.remove(categoryEntity.get());
+		}
+
+		bookEntity.setCategories(categoryEntities);
+
+		bookRepository.save(bookEntity);
+	}
+
+	private BookStatus mapToBookStatus(Integer bookCount) {
+		return (bookCount > 0) ? BookStatus.AVAILABLE : BookStatus.NOT_AVAILABLE;
+	}
     
-    //? Mapping
     private BookEntity mapToEntity(BookRequestDataTransferObject book) {
         BookEntity bookEntity = new BookEntity();
 
@@ -82,26 +122,52 @@ public class BookService {
         bookEntity.setTitle(book.getTitle());
         bookEntity.setIsbn(book.getIsbn());
         bookEntity.setBookCount(book.getBookCount());
-        bookEntity.setCategoryIds(mapToCategoryIds(book));
+        bookEntity.setCategories(mapToCategoryEntitySet(book));
+		bookEntity.setBookStatus(mapToBookStatus(book.getBookCount()));
 
         return bookEntity;
     }
 
-	private List<Long> mapToCategoryIds(BookRequestDataTransferObject book) {
-		List<Long> categoryIds = new ArrayList<>();
+    private Set<CategoryEntity> mapToCategoryEntitySet(BookRequestDataTransferObject book) {
+        Set<CategoryEntity> categories = new HashSet<>();
 
-		if (!Objects.isNull(book.getCategories())) {
+        if (!Objects.isNull(book.getCategories())) {
 			book.getCategories().forEach(categoryId -> {
 				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
 				
 				if (categoryEntity.isPresent()) {
-					categoryIds.add(categoryEntity.get().getId());
+					categories.add(categoryEntity.get());
+				}
+			});
+		}
+
+        return categories;
+    }
+
+	private List<CategoryDetailDataTransferObject> mapToCategoryDetailList(BookEntity book) {
+		List<CategoryDetailDataTransferObject> categoryIds = new ArrayList<>();
+
+		if (!Objects.isNull(book.getCategories())) {
+			book.getCategories().forEach(categoryId -> {
+				Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId.getId());
+				
+				if (categoryEntity.isPresent()) {
+					categoryIds.add(mapToCategoryDetail(categoryEntity.get()));
 				}
 			});
 		}
 
 		return categoryIds;
 	}
+
+    private CategoryDetailDataTransferObject mapToCategoryDetail(CategoryEntity categoryEntity) {
+        CategoryDetailDataTransferObject category = new CategoryDetailDataTransferObject();
+
+        category.setId(categoryEntity.getId());
+        category.setName(categoryEntity.getName());
+    
+       return category;
+    }
 
     private BookDetailDataTransferObject mapToDataTransferObject(BookEntity bookEntity) {
         BookDetailDataTransferObject book = new BookDetailDataTransferObject();
@@ -112,7 +178,8 @@ public class BookService {
         book.setTitle(bookEntity.getTitle());
         book.setIsbn(bookEntity.getIsbn());
         book.setBookCount(bookEntity.getBookCount());
-		book.setCategories(bookEntity.getCategoryIds());
+		book.setCategories(mapToCategoryDetailList(bookEntity));
+		book.setBookStatus(bookEntity.getBookStatus());
 
         return book;
     }

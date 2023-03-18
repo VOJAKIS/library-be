@@ -11,10 +11,8 @@ import java.util.List;
 public class BookController {
 
 	private final BookService bookService;
-	public static BookService bookServiceGlobal;
 	public BookController(BookService bookService) {
 		this.bookService = bookService;
-		bookServiceGlobal = this.bookService;
 	}
 
 	@GetMapping("/api/books")
@@ -45,5 +43,17 @@ public class BookController {
 	public void deleteCustomer(@PathVariable Long bookId) {
 		System.out.println("Delete book was called, " + bookId);
 		bookService.deleteBook(bookId);
+	}
+
+	@PutMapping("/api/books/{bookId}/bookCategory/{bookCategoryId}")
+	public void addBookCategory(@PathVariable Long bookId, @PathVariable Long bookCategoryId) {
+		System.out.println("Add book category, bookId: " + bookId + ", bookCategoryId: " + bookCategoryId);
+		bookService.addBookCategory(bookId, bookCategoryId);
+	}
+
+	@DeleteMapping("/api/books/{bookId}/bookCategory/{bookCategoryId}")
+	public void removeBookCategory(@PathVariable Long bookId, @PathVariable Long bookCategoryId) {
+		System.out.println("Remove book category, bookId: " + bookId + ", bookCategoryId: " + bookCategoryId);
+		bookService.removeBookCategory(bookId, bookCategoryId);
 	}
 }

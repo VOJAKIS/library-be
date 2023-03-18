@@ -2,6 +2,7 @@ package sk.umb.example.library.borrowing.controller;
 
 import java.util.List;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.bind.annotation.*;
 
 import sk.umb.example.library.borrowing.service.BorrowingDetailDataTransferObject;
@@ -18,14 +19,19 @@ public class BorrowingController {
 	}
 	
 	@GetMapping("/api/borrowings")
-	public List<BorrowingDetailDataTransferObject> searchBorrowing(@RequestParam(required = false) String bookName) {
-		if (bookName == null) {
-			System.out.println("Search borrowing was called.");
-			return borrowingService.getAllBorrowings();
-		} else {
-			System.out.println("Search borrowing was called, " + bookName);
-			return borrowingService.serachBorrowingsByBookName(bookName);
+	public List<BorrowingDetailDataTransferObject> searchBorrowing(
+		@RequestParam(required = false) String bookId,
+		@RequestParam(required = false) String customerId) {
+
+		if (!Strings.isEmpty(customerId)) {
+			return borrowingService.searchBorrowingsByCustomerId(Long.parseLong(customerId));
 		}
+
+		if (!Strings.isEmpty(bookId)) {
+			return borrowingService.searchBorrowingsByBookId(Long.parseLong(bookId));
+		}
+		
+		return borrowingService.getAllBorrowings();
 	}
 
 	@GetMapping("/api/borrowings/{borrowingId}")

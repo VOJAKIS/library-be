@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 
 @Repository
 public interface BookRepository extends CrudRepository<BookEntity,Long> {
-    Iterable<BookEntity> findById(String bookId);   
+	Iterable<BookEntity> findById(String bookId);
 }
